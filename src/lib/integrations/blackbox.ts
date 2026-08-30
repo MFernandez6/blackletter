@@ -153,43 +153,67 @@ export async function pullBlackboxClaims(): Promise<{
   }
 }
 
+function letterVaultDocType(
+  documentType: string
+): "DEMAND_LETTER" | "ESTIMATE" | "CORRESPONDENCE" {
+  if (documentType === "DEMAND_LETTER") return "DEMAND_LETTER";
+  if (documentType === "SCOPE_LETTER") return "ESTIMATE";
+  return "CORRESPONDENCE";
+}
+
 export async function attachExecutedToBlackbox(opts: {
   claimId: string;
+  generatedDocumentId: string;
+  documentType: string;
+  title: string;
   fileName: string;
-  fileUrl: string;
-  mimeType: string;
-}): Promise<{ ok: boolean; dryRun: boolean; error?: string }> {
-  if (process.env.BLACKBOX_DRY_RUN === "1" || !process.env.BLACKBOX_API_KEY) {
+  html: string;
+  fileUrl?: string | null;
+}): Promise<{ ok: boolean; dryRun: boolean; documentId?: string; error?: string }> {
+  const base = process.env.BLACKBOX_API_URL?.replace(/\/$/, "");
+  const key =
+    process.env.BLACKLETTER_API_KEY?.trim() ||
+    process.env.BLACKBOX_API_KEY?.trim();
+
+  if (!base || !key) {
     return { ok: true, dryRun: true };
   }
-  const base = process.env.BLACKBOX_API_URL?.replace(/\/$/, "");
-  if (!base) return { ok: false, dryRun: false, error: "BLACKBOX_API_URL missing." };
 
   try {
-    const res = await fetch(`${base}/api/upload`, {
+    const res = await fetch(`${base}/api/letter/documents`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.BLACKBOX_API_KEY}`,
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
       },
       body: JSON.stringify({
         claimId: opts.claimId,
+        generatedDocumentId: opts.generatedDocumentId,
+        documentType: opts.documentType,
+        title: opts.title,
         fileName: opts.fileName,
-        fileUrl: opts.fileUrl,
-        mimeType: opts.mimeType,
-        docType: "CORRESPONDENCE",
-        source: "BLACKLETTER",
+        html: opts.html,
+        fileUrl: opts.fileUrl || undefined,
+        mimeType: "text/html; charset=utf-8",
+        docType: letterVaultDocType(opts.documentType),
       }),
     });
     if (!res.ok) {
-      return { ok: false, dryRun: false, error: `BLACKBOX upload ${res.status}` };
+      const detail = await res.text().catch(() => "");
+      return {
+        ok: false,
+        dryRun: false,
+        error: `BLACKBOX vault ${res.status}${detail ? `: ${detail.slice(0, 180)}` : ""}`,
+      };
     }
-    return { ok: true, dryRun: false };
+    const data = (await res.json()) as { id?: string };
+    return { ok: true, dryRun: false, documentId: data.id };
   } catch (err) {
     return {
       ok: false,
       dryRun: false,
-      error: err instanceof Error ? err.message : "BLACKBOX upload failed.",
+      error: err instanceof Error ? err.message : "BLACKBOX vault upload failed.",
     };
   }
 }

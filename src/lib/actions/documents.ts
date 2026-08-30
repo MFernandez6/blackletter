@@ -273,13 +273,20 @@ export async function applyExecutedStatus(
     ledgerPayoutId = ledger.payoutId ?? (ledger.dryRun ? "dry-run" : null);
   }
 
-  if (doc.fileUrl) {
-    await attachExecutedToBlackbox({
-      claimId: doc.blackboxClaimId,
-      fileName: doc.fileName ?? `${doc.documentType}.html`,
-      fileUrl: absoluteFileUrl(doc.fileUrl),
-      mimeType: "text/html; charset=utf-8",
-    });
+  const vault = await attachExecutedToBlackbox({
+    claimId: doc.blackboxClaimId,
+    generatedDocumentId: doc.id,
+    documentType: doc.documentType,
+    title: doc.title,
+    fileName: `${doc.title}.html`,
+    html: documentHtmlFile(doc.title, doc.mergedBody).toString("utf8"),
+    fileUrl: doc.fileUrl ? absoluteFileUrl(doc.fileUrl) : null,
+  });
+  if (!vault.ok) {
+    return {
+      ok: false,
+      error: vault.error ?? "Could not file this document in the BLACKBOX vault.",
+    };
   }
 
   await prisma.generatedDocument.update({
@@ -289,6 +296,7 @@ export async function applyExecutedStatus(
       signedAt: doc.signedAt ?? now,
       executedAt: now,
       ledgerPayoutId,
+      blackboxDocumentId: vault.documentId ?? doc.blackboxDocumentId,
     },
   });
 
