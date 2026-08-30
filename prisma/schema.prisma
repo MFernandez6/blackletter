@@ -1,0 +1,253 @@
+// BLACKLETTER — Contract & Document Generation
+// Blackline Public Adjusters LLC
+//
+// Template versioning is first-class: every save appends TemplateVersion.
+// GeneratedDocument.templateVersionId is the compliance record of what
+// language was sent / signed on a given claim.
+//
+// Claim status lives in BLACKBOX. ClaimMirror is a read-only snapshot
+// plus BLACKGATE/BLACKMIRROR cache. Application code must never write
+// ClaimMirror.status except via BLACKBOX sync.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enums. Constrained string values live in src/lib/types.ts.
+
+model Staff {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  /// ADMIN | ADJUSTER | VIEWER
+  role         String   @default("ADJUSTER")
+  licenseNumber String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  templatesAuthored   DocumentTemplate[] @relation("TemplateAuthor")
+  versionsAuthored    TemplateVersion[]  @relation("VersionAuthor")
+  documentsGenerated  GeneratedDocument[] @relation("DocumentGenerator")
+  signatureRequests   SignatureRequest[] @relation("SignatureRequester")
+  auditEvents         LetterAuditEvent[] @relation("AuditActor")
+}
+
+/// Read-only mirror of a BLACKBOX claim used to populate merge fields.
+model ClaimMirror {
+  id                  String    @id @default(cuid())
+  blackboxClaimId     String    @unique
+  claimNumber         String    @unique
+  /// Mirrored from BLACKBOX. Written only by syncFromBlackbox / seed.
+  status              String
+  lossType            String
+  dateOfLoss          DateTime
+  propertyAddress     String
+  zipCode             String
+  county              String
+  lossDescription     String?
+  policyNumber        String?
+  carrierName         String?
+  insurerClaimNumber  String?
+  deskExaminerName    String?
+  deskExaminerPhone   String?
+  deskExaminerEmail   String?
+  fieldAdjusterName   String?
+  estimatedValue      Float?
+  demandAmount        Float?
+  rcvAmount           Float?
+  acvAmount           Float?
+  settlementAmount    Float?
+  settlementDate      DateTime?
+  contingencyFeePercent Float   @default(20)
+  isCatClaim          Boolean   @default(false)
+  aobApplicable       Boolean   @default(false)
+  assignedAdjuster    String?
+  assignedAdjusterLicense String?
+  claimantFirstName   String
+  claimantLastName    String
+  claimantEmail       String
+  claimantPhone       String
+  claimantMailing     String
+  intakeNumber        String?
+  /// Cached BLACKGATE on-file docs: JSON array of { documentType, status, fileUrl? }
+  intakeDocumentsJson String    @default("[]")
+  /// Cached BLACKMIRROR scope: JSON { photoCount, scopeSummary, reportUrl? }
+  mirrorScopeJson     String    @default("{}")
+  syncedAt            DateTime  @default(now())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  documents GeneratedDocument[]
+
+  @@index([status])
+  @@index([updatedAt])
+}
+
+model DocumentTemplate {
+  id          String   @id @default(cuid())
+  /// See DOCUMENT_TYPES
+  documentType String  @unique
+  name        String
+  description String
+  /// See LIFECYCLE_STAGES
+  stage       String
+  /// JSON array of merge field keys, e.g. ["claimant_name","claim_number"]
+  mergeFieldsJson String
+  /// True when this type is still offered in the library
+  isActive    Boolean  @default(true)
+  currentVersionId String? @unique
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy      Staff             @relation("TemplateAuthor", fields: [createdById], references: [id], onDelete: Restrict)
+  currentVersion TemplateVersion?  @relation("CurrentVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
+  versions       TemplateVersion[] @relation("TemplateVersions")
+  generated      GeneratedDocument[]
+  stageMap       DocumentStageMap?
+
+  @@index([stage, isActive])
+}
+
+/// Append-only. Never update body in place — create a new row and point
+/// DocumentTemplate.currentVersionId at it. Compliance defense depends on
+/// knowing exactly which language was signed on a claim.
+model TemplateVersion {
+  id          String   @id @default(cuid())
+  templateId  String
+  version     Int
+  body        String
+  changeNote  String?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  template   DocumentTemplate    @relation("TemplateVersions", fields: [templateId], references: [id], onDelete: Restrict)
+  createdBy  Staff               @relation("VersionAuthor", fields: [createdById], references: [id], onDelete: Restrict)
+  currentOf  DocumentTemplate?   @relation("CurrentVersion")
+  generated  GeneratedDocument[]
+
+  @@unique([templateId, version])
+  @@index([templateId, createdAt])
+}
+
+/// Maps each document type to claim-lifecycle placement.
+/// Suite-wide "what does this claim need next?" reads this table.
+model DocumentStageMap {
+  id            String   @id @default(cuid())
+  documentType  String   @unique
+  stage         String
+  /// JSON array of BLACKBOX ClaimStatus values this type is due at
+  claimStatusesJson String
+  sortOrder     Int      @default(0)
+  required      Boolean  @default(false)
+  /// Skip unless ClaimMirror.aobApplicable
+  aobOnly       Boolean  @default(false)
+  templateId    String?  @unique
+
+  template DocumentTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+}
+
+model GeneratedDocument {
+  id                String   @id @default(cuid())
+  claimMirrorId     String
+  blackboxClaimId   String
+  claimNumber       String
+  templateId        String
+  templateVersionId String
+  documentType      String
+  title             String
+  /// Merged body at generation time (immutable snapshot of what was sent)
+  mergedBody        String
+  mergeValuesJson   String
+  /// draft | sent | signed | executed
+  status            String   @default("draft")
+  fileUrl           String?
+  fileName          String?
+  generatedById     String
+  generatedAt       DateTime @default(now())
+  sentAt            DateTime?
+  signedAt          DateTime?
+  executedAt        DateTime?
+  /// Set when an executed settlement/release opened a BLACKLEDGER payout
+  ledgerPayoutId    String?
+  blackboxDocumentId String?
+  blackgateIntakeId  String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  claim           ClaimMirror      @relation(fields: [claimMirrorId], references: [id], onDelete: Restrict)
+  template        DocumentTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  templateVersion TemplateVersion  @relation(fields: [templateVersionId], references: [id], onDelete: Restrict)
+  generatedBy     Staff            @relation("DocumentGenerator", fields: [generatedById], references: [id], onDelete: Restrict)
+  signatureRequests SignatureRequest[]
+
+  @@index([claimMirrorId, generatedAt])
+  @@index([blackboxClaimId, generatedAt])
+  @@index([claimNumber])
+  @@index([status, documentType])
+  @@index([templateVersionId])
+}
+
+model SignatureRequest {
+  id                  String   @id @default(cuid())
+  generatedDocumentId String
+  /// SignWell document id (or local dry-run id)
+  provider            String   @default("signwell")
+  providerDocumentId  String   @unique
+  embeddedUrl         String?
+  /// created | sent | viewed | signed | completed | declined | error
+  status              String   @default("created")
+  recipientName       String
+  recipientEmail      String
+  testMode            Boolean  @default(true)
+  lastEventType       String?
+  lastEventAt         DateTime?
+  requestedById       String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  document    GeneratedDocument @relation(fields: [generatedDocumentId], references: [id], onDelete: Restrict)
+  requestedBy Staff             @relation("SignatureRequester", fields: [requestedById], references: [id], onDelete: Restrict)
+  events      SignatureEvent[]
+
+  @@index([generatedDocumentId])
+  @@index([status])
+}
+
+/// Append-only webhook / status trail for a SignWell request
+model SignatureEvent {
+  id                 String   @id @default(cuid())
+  signatureRequestId String
+  eventType          String
+  payloadJson        String
+  receivedAt         DateTime @default(now())
+
+  request SignatureRequest @relation(fields: [signatureRequestId], references: [id], onDelete: Cascade)
+
+  @@index([signatureRequestId, receivedAt])
+}
+
+model LetterAuditEvent {
+  id         String   @id @default(cuid())
+  actorId    String
+  action     String
+  entityType String
+  entityId   String?
+  summary    String
+  metaJson   String?
+  createdAt  DateTime @default(now())
+
+  actor Staff @relation("AuditActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([createdAt])
+  @@index([actorId])
+  @@index([action])
+}
