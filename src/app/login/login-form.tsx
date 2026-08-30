@@ -19,7 +19,14 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const idleNotice = searchParams.get("reason") === "idle";
-  const [error, setError] = useState("");
+  const configError =
+    searchParams.get("error") === "Configuration" ||
+    searchParams.get("error") === "ServerError";
+  const [error, setError] = useState(
+    configError
+      ? "Auth is missing NEXTAUTH_SECRET on the host. Set it in Vercel and redeploy."
+      : ""
+  );
   const {
     register,
     handleSubmit,

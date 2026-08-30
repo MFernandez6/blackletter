@@ -30,8 +30,16 @@ declare module "next-auth/jwt" {
   }
 }
 
+function authSecret() {
+  return (
+    process.env.NEXTAUTH_SECRET?.trim() ||
+    process.env.AUTH_SECRET?.trim() ||
+    "blackletter-set-NEXTAUTH_SECRET-in-vercel"
+  );
+}
+
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: authSecret(),
   session: {
     strategy: "jwt",
     maxAge: 8 * 60 * 60,
@@ -39,6 +47,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
   providers: [
     CredentialsProvider({

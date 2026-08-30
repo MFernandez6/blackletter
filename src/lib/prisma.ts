@@ -7,7 +7,12 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function bundledSqlitePath() {
-  return path.join(process.cwd(), "prisma", "dev.db");
+  const candidates = [
+    path.join(process.cwd(), "prisma", "dev.db"),
+    path.join(process.cwd(), ".next", "server", "prisma", "dev.db"),
+    path.join("/var/task", "prisma", "dev.db"),
+  ];
+  return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
 }
 
 function resolveDatabaseUrl(): string | undefined {
