@@ -34,7 +34,11 @@ export function DocumentActions({
       setError(result.error);
       return;
     }
-    toast.success(result.data.dryRun ? "Marked sent (SignWell dry-run)" : "Sent to SignWell");
+    toast.success(
+      result.data.dryRun
+        ? "Marked sent (Google Workspace not configured)"
+        : "Shared in Google Docs for signature"
+    );
     router.refresh();
   }
 
@@ -61,7 +65,7 @@ export function DocumentActions({
       <div className="flex flex-wrap gap-2">
         {status === "draft" ? (
           <Button type="button" variant="solid" size="sm" disabled={pending} onClick={send}>
-            Send to SignWell
+            Send via Google Workspace
           </Button>
         ) : null}
         {status === "sent" || status === "signed" ? (

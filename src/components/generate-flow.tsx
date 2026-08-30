@@ -67,8 +67,8 @@ export function GenerateFlow({
       }
       toast.success(
         sent.data.dryRun
-          ? "Draft stored · SignWell dry-run (no API key)"
-          : "Sent to SignWell"
+          ? "Draft stored · Google Workspace not configured"
+          : "Shared in Google Docs for signature"
       );
     } else {
       setPending(false);
@@ -167,7 +167,7 @@ export function GenerateFlow({
                 disabled={pending}
                 onClick={() => generate(true)}
               >
-                {pending ? "Working…" : "Preview · send to SignWell"}
+                {pending ? "Working…" : "Preview · send via Google Workspace"}
               </Button>
             </div>
           ) : null}

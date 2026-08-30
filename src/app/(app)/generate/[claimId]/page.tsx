@@ -57,7 +57,7 @@ export default async function GenerateClaimPage({
   return (
     <div className="space-y-8">
       <div>
-        <p className="eyebrow">Generate · preview · SignWell</p>
+        <p className="eyebrow">Generate · preview · Google Workspace</p>
         <div className="mt-2 flex flex-wrap items-end gap-4">
           <h1 className="font-serif text-2xl tracking-[0.08em] text-brand-white">
             {claim.claimantFirstName} {claim.claimantLastName}

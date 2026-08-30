@@ -67,13 +67,25 @@ export default async function DocumentPage({
 
       {doc.signatureRequests.length > 0 ? (
         <section className="border border-brand-white/10 p-4">
-          <p className="eyebrow mb-3">SignWell</p>
+          <p className="eyebrow mb-3">Google Workspace</p>
           {doc.signatureRequests.map((r) => (
             <div key={r.id} className="text-sm text-brand-white/80">
               <p>
                 {r.recipientName} · {r.recipientEmail} · {r.status}
-                {r.testMode ? " · test/dry-run" : ""}
+                {r.testMode ? " · local only (Workspace not configured)" : ""}
               </p>
+              {r.embeddedUrl ? (
+                <p className="mt-2">
+                  <a
+                    href={r.embeddedUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-letter-soft underline underline-offset-4"
+                  >
+                    Open Google Doc
+                  </a>
+                </p>
+              ) : null}
               {r.events.map((e) => (
                 <p key={e.id} className="font-mono text-xs text-brand-slate">
                   {format(e.receivedAt, "MMM d p")} · {e.eventType}

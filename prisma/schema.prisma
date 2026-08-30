@@ -199,8 +199,8 @@ model GeneratedDocument {
 model SignatureRequest {
   id                  String   @id @default(cuid())
   generatedDocumentId String
-  /// SignWell document id (or local dry-run id)
-  provider            String   @default("signwell")
+  /// google_workspace | signwell (legacy) | local dry-run id
+  provider            String   @default("google_workspace")
   providerDocumentId  String   @unique
   embeddedUrl         String?
   /// created | sent | viewed | signed | completed | declined | error
@@ -222,7 +222,7 @@ model SignatureRequest {
   @@index([status])
 }
 
-/// Append-only webhook / status trail for a SignWell request
+/// Append-only status trail for a signature request
 model SignatureEvent {
   id                 String   @id @default(cuid())
   signatureRequestId String

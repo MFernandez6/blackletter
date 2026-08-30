@@ -20,15 +20,15 @@ function publicObjectUrl(cfg: { url: string }, objectPath: string) {
 }
 
 /**
- * Persist an executed / sent document via Supabase Storage.
- * Falls back to public/uploads for local dev when Supabase is not configured.
+ * Optional local / Supabase copy. Drafts live in the database (`mergedBody`).
+ * Production send creates a Google Doc — this helper must never fail a generate.
  */
 export async function storeLetterDocument(opts: {
   claimNumber: string;
   fileName: string;
   bytes: Buffer;
   mimeType: string;
-}): Promise<StoredDocument> {
+}): Promise<StoredDocument | null> {
   const safeClaim = opts.claimNumber.replace(/[^a-zA-Z0-9._-]/g, "_");
   const safeName = opts.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const objectPath = `${safeClaim}/${Date.now()}-${safeName}`;
@@ -61,9 +61,7 @@ export async function storeLetterDocument(opts: {
   }
 
   if (process.env.VERCEL) {
-    throw new Error(
-      "File storage is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
-    );
+    return null;
   }
 
   const relDir = path.join("uploads", safeClaim);
@@ -86,6 +84,8 @@ export function documentHtmlFile(title: string, body: string): Buffer {
     h1, h2 { font-family: "Times New Roman", serif; letter-spacing: 0.04em; }
     .meta { font-size: 12px; color: #5b6570; text-transform: uppercase; letter-spacing: 0.14em; }
     p { margin: 0 0 1em; }
+    .sign { margin-top: 48px; padding-top: 24px; border-top: 1px solid #c5ccd3; font-size: 13px; }
+    .sign .line { margin-top: 28px; letter-spacing: 0.08em; }
   </style>
 </head>
 <body>
@@ -93,6 +93,11 @@ ${body
   .split(/\n{2,}/)
   .map((para) => `<p>${escapeHtml(para).replace(/\n/g, "<br/>")}</p>`)
   .join("\n")}
+<div class="sign">
+  <p class="meta">Signature</p>
+  <p>Sign in Google Docs with Workspace eSignature (Tools → eSignature), then notify Blackline when complete.</p>
+  <p class="line">Client signature _______________________________ Date ______________</p>
+</div>
 </body>
 </html>`;
   return Buffer.from(html, "utf8");

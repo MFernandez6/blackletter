@@ -7,7 +7,7 @@ import { DOCUMENT_TYPE_LABELS, TRIGGERS_LEDGER_PAYOUT } from "@/lib/constants";
 import { attachExecutedToBlackbox } from "@/lib/integrations/blackbox";
 import { triggerLedgerPayout } from "@/lib/integrations/blackledger";
 import { pullBlackmirrorScope } from "@/lib/integrations/blackmirror";
-import { createSignWellDocument } from "@/lib/integrations/signwell";
+import { sendViaGoogleWorkspace } from "@/lib/integrations/google-workspace";
 import { mergeTemplate, valuesFromClaim } from "@/lib/merge";
 import { prisma } from "@/lib/prisma";
 import {
@@ -98,8 +98,8 @@ export async function generateDocumentAction(
         mergedBody,
         mergeValuesJson: JSON.stringify(values),
         status: "draft",
-        fileUrl: stored.fileUrl,
-        fileName: stored.storagePath.split("/").pop() ?? stored.storagePath,
+        fileUrl: stored?.fileUrl ?? null,
+        fileName: stored?.storagePath.split("/").pop() ?? `${template.documentType}.html`,
         generatedById: staff.id,
         notes: parsed.data.notes ?? null,
       },
@@ -142,7 +142,6 @@ export async function sendForSignatureAction(
       include: { claim: true },
     });
     if (!doc) return { ok: false, error: "Document not found." };
-    if (!doc.fileUrl) return { ok: false, error: "Document has no stored file." };
 
     const recipientName =
       parsed.data.recipientName ??
@@ -153,10 +152,10 @@ export async function sendForSignatureAction(
       return { ok: false, error: "Claimant email is required to send for signature." };
     }
 
-    const sent = await createSignWellDocument({
-      name: doc.title,
-      fileUrl: absoluteFileUrl(doc.fileUrl),
-      fileName: doc.fileName ?? `${doc.documentType}.html`,
+    const sent = await sendViaGoogleWorkspace({
+      title: doc.title,
+      html: documentHtmlFile(doc.title, doc.mergedBody).toString("utf8"),
+      claimNumber: doc.claimNumber,
       recipientName,
       recipientEmail,
     });
@@ -164,13 +163,13 @@ export async function sendForSignatureAction(
     const request = await prisma.signatureRequest.create({
       data: {
         generatedDocumentId: doc.id,
-        provider: "signwell",
+        provider: sent.provider,
         providerDocumentId: sent.providerDocumentId,
         embeddedUrl: sent.embeddedUrl,
         status: sent.status,
         recipientName,
         recipientEmail,
-        testMode: sent.dryRun || process.env.SIGNWELL_TEST_MODE !== "0",
+        testMode: sent.dryRun,
         requestedById: staff.id,
         lastEventType: sent.dryRun ? "dry_run_sent" : "document_sent",
         lastEventAt: new Date(),
@@ -179,7 +178,12 @@ export async function sendForSignatureAction(
 
     await prisma.generatedDocument.update({
       where: { id: doc.id },
-      data: { status: "sent", sentAt: new Date() },
+      data: {
+        status: "sent",
+        sentAt: new Date(),
+        fileUrl: sent.embeddedUrl ?? doc.fileUrl,
+        fileName: doc.fileName ?? `${doc.documentType}.gdoc`,
+      },
     });
 
     await logLetterAudit({
@@ -188,8 +192,8 @@ export async function sendForSignatureAction(
       entityType: "SignatureRequest",
       entityId: request.id,
       summary: sent.dryRun
-        ? `Dry-run send ${doc.documentType} for ${doc.claimNumber}`
-        : `Sent ${doc.documentType} to SignWell for ${doc.claimNumber}`,
+        ? `Dry-run send ${doc.documentType} for ${doc.claimNumber} (Google Workspace not configured)`
+        : `Shared ${doc.documentType} via Google Docs for ${doc.claimNumber}`,
     });
 
     revalidateDocs(doc.claimMirrorId, doc.id);
@@ -200,7 +204,7 @@ export async function sendForSignatureAction(
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "Unable to send to SignWell.",
+      error: err instanceof Error ? err.message : "Unable to send via Google Workspace.",
     };
   }
 }

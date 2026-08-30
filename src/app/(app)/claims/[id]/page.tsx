@@ -100,7 +100,7 @@ export default async function ClaimTimelinePage({
                       {format(d.generatedAt, "MMM d, yyyy p")} · v{d.templateVersion.version} ·{" "}
                       {d.generatedBy.name}
                       {d.signatureRequests[0]
-                        ? ` · SignWell ${d.signatureRequests[0].status}`
+                        ? ` · ${d.signatureRequests[0].provider === "google_workspace" ? "Google Docs" : "Signature"} ${d.signatureRequests[0].status}`
                         : ""}
                     </p>
                   </Link>
