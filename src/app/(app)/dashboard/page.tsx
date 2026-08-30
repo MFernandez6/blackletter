@@ -14,24 +14,43 @@ export default async function DashboardPage() {
   const session = await getSession();
   const writable = session ? canEdit(session.user.role) : false;
 
-  const [claims, drafts, awaiting, executed, templates] = await Promise.all([
-    prisma.claimMirror.findMany({ orderBy: { updatedAt: "desc" } }),
-    prisma.generatedDocument.count({ where: { status: "draft" } }),
-    prisma.generatedDocument.count({ where: { status: "sent" } }),
-    prisma.generatedDocument.count({ where: { status: "executed" } }),
-    prisma.documentTemplate.count({ where: { isActive: true } }),
-  ]);
+  let claims: Awaited<ReturnType<typeof prisma.claimMirror.findMany>> = [];
+  let drafts = 0;
+  let awaiting = 0;
+  let executed = 0;
+  let templates = 0;
+  let loadError = "";
 
-  const suggestions = await Promise.all(
-    claims.map((c) =>
-      nextDocumentForClaim({
-        claimId: c.blackboxClaimId,
-        claimNumber: c.claimNumber,
-        status: c.status,
-        aobApplicable: c.aobApplicable,
-      })
-    )
-  );
+  try {
+    const loaded = await Promise.all([
+      prisma.claimMirror.findMany({ orderBy: { updatedAt: "desc" } }),
+      prisma.generatedDocument.count({ where: { status: "draft" } }),
+      prisma.generatedDocument.count({ where: { status: "sent" } }),
+      prisma.generatedDocument.count({ where: { status: "executed" } }),
+      prisma.documentTemplate.count({ where: { isActive: true } }),
+    ]);
+    claims = loaded[0];
+    drafts = loaded[1];
+    awaiting = loaded[2];
+    executed = loaded[3];
+    templates = loaded[4];
+  } catch (error) {
+    console.error("dashboard load failed", error);
+    loadError = "Document store is unavailable. Check DATABASE_URL on the host.";
+  }
+
+  const suggestions = loadError
+    ? []
+    : await Promise.all(
+        claims.map((c) =>
+          nextDocumentForClaim({
+            claimId: c.blackboxClaimId,
+            claimNumber: c.claimNumber,
+            status: c.status,
+            aobApplicable: c.aobApplicable,
+          })
+        )
+      );
 
   const due = claims
     .map((c, i) => ({ claim: c, next: suggestions[i]?.next ?? null }))
@@ -39,6 +58,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-10">
+      {loadError ? (
+        <div className="border border-denied/40 bg-denied-muted px-4 py-3 text-sm text-denied-soft">
+          {loadError}
+        </div>
+      ) : null}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Document desk</p>

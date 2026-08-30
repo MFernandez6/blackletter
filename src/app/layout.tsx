@@ -13,6 +13,7 @@ const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
+  preload: false,
 });
 
 const cinzel = Cinzel({

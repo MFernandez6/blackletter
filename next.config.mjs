@@ -17,7 +17,20 @@ function resolveAuthUrl() {
 // (including /_not-found). Always leave a valid absolute URL.
 process.env.NEXTAUTH_URL = resolveAuthUrl();
 
+// Production NextAuth throws if secret is missing, which surfaces as an
+// opaque Server Components digest in the browser.
+if (!process.env.NEXTAUTH_SECRET?.trim()) {
+  process.env.NEXTAUTH_SECRET =
+    process.env.AUTH_SECRET?.trim() || "blackletter-set-NEXTAUTH_SECRET-in-vercel";
+}
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  experimental: {
+    outputFileTracingIncludes: {
+      "/*": ["./prisma/dev.db"],
+    },
+  },
+};
 
 export default nextConfig;

@@ -31,6 +31,7 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
     maxAge: 8 * 60 * 60,
@@ -50,21 +51,26 @@ export const authOptions: NextAuthOptions = {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const staff = await prisma.staff.findUnique({
-          where: { email: parsed.data.email.toLowerCase() },
-        });
+        try {
+          const staff = await prisma.staff.findUnique({
+            where: { email: parsed.data.email.toLowerCase() },
+          });
 
-        if (!staff || !staff.isActive) return null;
+          if (!staff || !staff.isActive) return null;
 
-        const valid = await compare(parsed.data.password, staff.passwordHash);
-        if (!valid) return null;
+          const valid = await compare(parsed.data.password, staff.passwordHash);
+          if (!valid) return null;
 
-        return {
-          id: staff.id,
-          email: staff.email,
-          name: staff.name,
-          role: staff.role as StaffRole,
-        };
+          return {
+            id: staff.id,
+            email: staff.email,
+            name: staff.name,
+            role: staff.role as StaffRole,
+          };
+        } catch (error) {
+          console.error("authorize failed", error);
+          return null;
+        }
       },
     }),
   ],
@@ -103,8 +109,13 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-export function getSession() {
-  return getServerSession(authOptions);
+export async function getSession() {
+  try {
+    return await getServerSession(authOptions);
+  } catch (error) {
+    console.error("getSession failed", error);
+    return null;
+  }
 }
 
 export async function resolveSessionStaff(session: {

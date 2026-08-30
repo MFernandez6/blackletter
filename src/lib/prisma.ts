@@ -1,12 +1,38 @@
+import { copyFileSync, existsSync } from "node:fs";
+import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
+function bundledSqlitePath() {
+  return path.join(process.cwd(), "prisma", "dev.db");
+}
+
+function resolveDatabaseUrl(): string | undefined {
+  const configured = process.env.DATABASE_URL?.trim();
+  if (configured && !configured.startsWith("file:")) {
+    return configured;
+  }
+
+  if (process.env.VERCEL) {
+    const dest = "/tmp/blackletter.db";
+    const source = bundledSqlitePath();
+    if (!existsSync(dest) && existsSync(source)) {
+      copyFileSync(source, dest);
+    }
+    return `file:${dest}`;
+  }
+
+  return configured || "file:./dev.db";
+}
+
 function createPrismaClient() {
+  const url = resolveDatabaseUrl();
   return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    datasources: url ? { db: { url } } : undefined,
   });
 }
 
