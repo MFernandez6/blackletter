@@ -74,16 +74,17 @@ export default function LoginForm() {
           </p>
         </div>
 
-        <div className="mb-8 w-full border border-brand-white/10 bg-brand-navy-deep/40 px-4 py-5">
+        <div className="mb-8 w-full border border-brand-white/10 bg-brand-navy-deep/40 px-4 py-6">
           <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-brand-slate">
             Operated for
           </p>
-          <div className="mt-3 flex flex-col items-center">
-            <BlacklineMark size={56} className="text-brand-gold" />
-            <p className="mt-3 font-serif text-sm font-semibold tracking-[0.22em] text-brand-gold">
+          <div className="mt-4 flex flex-col items-center">
+            <BlacklineMark size={64} className="text-brand-gold" />
+            <p className="mt-4 font-serif text-sm font-semibold tracking-[0.28em] text-brand-gold">
               BLACKLINE
             </p>
-            <p className="mt-1 font-serif text-[9px] font-semibold uppercase tracking-[0.2em] text-brand-white/70">
+            <div className="mt-2.5 h-px w-16 bg-brand-gold/70" />
+            <p className="mt-2.5 font-serif text-[9px] font-semibold uppercase tracking-[0.22em] text-brand-white/70">
               Public Adjusters LLC
             </p>
           </div>
