@@ -1,16 +1,23 @@
 import { LetterFooter, Letterhead } from "@/components/brand/letterhead";
-import { layoutLetterSections } from "@/lib/stationery";
+import { layoutLetterSections, matterBlockHtml } from "@/lib/stationery";
 import { highlightMergeFields } from "@/lib/merge";
 import { cn } from "@/lib/utils";
+
+function escapeText(text: string) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
 function sectionHtml(text: string, highlightFields: boolean) {
   return highlightFields
     ? highlightMergeFields(text).replace(/\n/g, "<br/>")
-    : text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\n/g, "<br/>");
+    : escapeText(text).replace(/\n/g, "<br/>");
+}
+
+function inlineHtml(text: string, highlightFields: boolean) {
+  return highlightFields ? highlightMergeFields(text) : escapeText(text);
 }
 
 export function DocPreview({
@@ -24,9 +31,10 @@ export function DocPreview({
 }) {
   const sections = layoutLetterSections(body);
   const html = sections
-    .map(
-      (s) =>
-        `<div class="doc-${s.kind}">${sectionHtml(s.text, highlightFields)}</div>`
+    .map((s) =>
+      s.kind === "matter"
+        ? matterBlockHtml(s.text, (value) => inlineHtml(value, highlightFields))
+        : `<div class="doc-${s.kind}">${sectionHtml(s.text, highlightFields)}</div>`
     )
     .join("\n");
 

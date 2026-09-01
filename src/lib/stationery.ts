@@ -99,11 +99,70 @@ export function layoutLetterSections(body: string): LetterSection[] {
   return sections;
 }
 
+const MATTER_LINE_RE =
+  /^(Re|Insured|Client|Policy(?:\s+No\.?)?|Claim(?:\s+No\.?)?|Carrier Claim|Date of Loss|Date|Loss Location|Our File|Blackline File|Location|File|Loss|DOL)\s*:?\s+(.*)$/i;
+
+export type MatterRow = { label: string; value: string };
+
+export function parseMatterBlock(text: string): {
+  subject: string | null;
+  rows: MatterRow[];
+} {
+  let subject: string | null = null;
+  const rows: MatterRow[] = [];
+
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const match = line.match(MATTER_LINE_RE);
+    if (!match) {
+      if (!subject) subject = line;
+      else rows.push({ label: "", value: line });
+      continue;
+    }
+    const label = match[1].replace(/\s+/g, " ").trim();
+    const value = match[2].trim();
+    if (/^re$/i.test(label)) {
+      subject = value;
+    } else {
+      rows.push({ label, value });
+    }
+  }
+
+  return { subject, rows };
+}
+
+export function matterBlockHtml(
+  text: string,
+  formatInline: (value: string) => string
+): string {
+  const { subject, rows } = parseMatterBlock(text);
+  const subjectHtml = subject
+    ? `<p class="doc-matter-subject">${formatInline(subject)}</p>`
+    : "";
+  const rowsHtml = rows.length
+    ? `<table class="doc-matter-rows" width="100%" cellpadding="0" cellspacing="0">${rows
+        .map(
+          (row) =>
+            `<tr><td class="doc-matter-label" valign="top">${
+              row.label ? formatInline(row.label) : ""
+            }</td><td class="doc-matter-value">${formatInline(row.value)}</td></tr>`
+        )
+        .join("")}</table>`
+    : "";
+
+  return `<table class="doc-matter" width="100%" cellpadding="0" cellspacing="0"><tr>
+    <td class="doc-re" valign="top">RE</td>
+    <td class="doc-matter-body">${subjectHtml}${rowsHtml}</td>
+  </tr></table>`;
+}
+
 export function letterSectionsHtml(sections: LetterSection[]): string {
   return sections
-    .map(
-      (s) =>
-        `<div class="doc-${s.kind}">${escapeHtml(s.text).replace(/\n/g, "<br/>")}</div>`
+    .map((s) =>
+      s.kind === "matter"
+        ? matterBlockHtml(s.text, escapeHtml)
+        : `<div class="doc-${s.kind}">${escapeHtml(s.text).replace(/\n/g, "<br/>")}</div>`
     )
     .join("\n");
 }
@@ -179,13 +238,39 @@ export function wrapStationeryHtml(
     }
     .doc-address { margin: 0 0 1.15em; }
     .doc-matter {
-      text-align: center;
-      margin: 0 auto 1.7em;
-      max-width: 28em;
-      padding: 14px 16px;
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 1.7em;
+    }
+    .doc-re {
+      width: 36px;
+      padding: 12px 12px 0 0;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: #c6a85b;
+      line-height: 1.2;
+    }
+    .doc-matter-body {
+      padding: 12px 16px;
       border: 1px solid #c6a85b;
       line-height: 1.55;
     }
+    .doc-matter-subject {
+      margin: 0 0 8px;
+      text-align: left;
+      font-weight: 700;
+    }
+    .doc-matter-rows { width: 100%; border-collapse: collapse; }
+    .doc-matter-label {
+      width: 9.25em;
+      padding: 2px 18px 2px 0;
+      color: #4a5560;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .doc-matter-value { text-align: left; }
     .doc-body { margin: 0 0 1.05em; }
     .doc-signoff {
       text-align: center;

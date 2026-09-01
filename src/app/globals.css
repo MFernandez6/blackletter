@@ -118,7 +118,31 @@
   }
 
   .doc-preview .doc-matter {
-    @apply mx-auto mb-7 max-w-md whitespace-pre-wrap border border-[#C6A85B] px-4 py-3.5 text-center leading-snug;
+    @apply mb-7 w-full border-collapse;
+  }
+
+  .doc-preview .doc-re {
+    @apply w-9 pr-3 pt-3 text-left align-top font-serif text-[13px] font-bold leading-none tracking-[0.2em] text-[#C6A85B];
+  }
+
+  .doc-preview .doc-matter-body {
+    @apply border border-[#C6A85B] px-4 py-3 text-left leading-snug;
+  }
+
+  .doc-preview .doc-matter-subject {
+    @apply !mb-2 !mt-0 text-left font-bold;
+  }
+
+  .doc-preview .doc-matter-rows {
+    @apply w-full border-collapse;
+  }
+
+  .doc-preview .doc-matter-label {
+    @apply w-[9.25em] whitespace-nowrap py-0.5 pr-4 text-left align-top text-[#4a5560];
+  }
+
+  .doc-preview .doc-matter-value {
+    @apply py-0.5 text-left;
   }
 
   .doc-preview .doc-signoff {
