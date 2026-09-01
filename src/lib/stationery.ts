@@ -22,10 +22,10 @@ function escapeHtml(value: string): string {
 function letterheadHtml(): string {
   return `<table class="lh" width="100%" cellpadding="0" cellspacing="0">
   <tr>
-    <td width="94" valign="middle" style="width:94px;padding:0 16px 0 0;">
-      <img src="${MARK_PNG}" width="78" height="48" alt="Blackline Public Adjusters" />
+    <td width="100" valign="middle" style="width:100px;padding:0 14px 0 0;">
+      <img src="${MARK_PNG}" width="85" height="52" alt="Blackline Public Adjusters" />
     </td>
-    <td valign="middle" style="padding:0;">
+    <td valign="middle" style="padding:0;height:52px;">
       <div class="word">BLACKLINE</div>
       <div class="sub">Public Adjusters LLC</div>
     </td>
@@ -138,20 +138,22 @@ export function wrapStationeryHtml(
     .lh { border-collapse: collapse; margin: 0 0 6px; }
     .word {
       font-family: "Times New Roman", Times, serif;
-      font-size: 22px;
+      font-size: 34px;
       font-weight: 700;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.14em;
       color: #0f1c2e;
-      line-height: 1;
+      line-height: 0.82;
     }
     .sub {
       font-family: "Times New Roman", Times, serif;
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 600;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: #4a5560;
-      padding-top: 2px;
+      padding-top: 0;
+      margin-top: 1px;
+      line-height: 1;
     }
     .rule {
       height: 1px;

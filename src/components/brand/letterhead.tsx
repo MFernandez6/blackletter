@@ -2,16 +2,21 @@ import { FIRM } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { BlacklineMark } from "@/components/brand/blackline-mark";
 
+const MARK_H = 52;
+
 export function Letterhead({ className }: { className?: string }) {
   return (
     <header className={cn("mb-10", className)}>
       <div className="flex items-center gap-4">
-        <BlacklineMark size={42} className="text-[#C6A85B]" />
-        <div className="min-w-0">
-          <p className="font-serif text-[1.55rem] font-bold leading-none tracking-[0.22em] text-[#0F1C2E] sm:text-[1.7rem]">
+        <BlacklineMark size={MARK_H} className="text-[#C6A85B]" />
+        <div
+          className="flex min-w-0 flex-col justify-center"
+          style={{ height: MARK_H }}
+        >
+          <p className="font-serif text-[32px] font-bold leading-[0.82] tracking-[0.14em] text-[#0F1C2E] sm:text-[34px]">
             BLACKLINE
           </p>
-          <p className="mt-0.5 font-serif text-[10px] font-semibold uppercase leading-none tracking-[0.22em] text-[#0F1C2E]/65">
+          <p className="-mt-0.5 font-serif text-[11px] font-semibold uppercase leading-none tracking-[0.2em] text-[#0F1C2E]/65 sm:text-[12px]">
             Public Adjusters LLC
           </p>
         </div>
