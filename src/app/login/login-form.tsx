@@ -52,7 +52,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center px-6">
+    <div className="relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden px-5 py-12 sm:px-6">
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -61,26 +61,26 @@ export default function LoginForm() {
         }}
       />
 
-      <div className="relative w-full max-w-sm">
-        <div className="mb-8 text-center">
+      <div className="relative mx-auto flex w-full max-w-[21rem] flex-col items-center text-center sm:max-w-sm">
+        <div className="mb-8 flex w-full flex-col items-center">
           <p className="eyebrow mb-4">Contract & document generation</p>
           <BlackletterMark
             as="h1"
-            className="justify-center font-serif text-4xl font-bold tracking-[0.22em] text-brand-gold sm:text-5xl"
+            className="font-serif text-[clamp(1.7rem,8vw,2.75rem)] font-bold tracking-[0.12em] text-brand-gold sm:tracking-[0.18em]"
           />
-          <p className="mt-4 text-sm leading-relaxed text-brand-white/80">
+          <p className="mt-4 max-w-[18.5rem] text-sm leading-relaxed text-balance text-brand-white/80 sm:max-w-none">
             Letters of representation, PA contracts, and disclosure forms.
             Not a client portal.
           </p>
         </div>
 
-        <div className="mb-8 border border-brand-white/10 bg-brand-navy-deep/40 px-4 py-4 text-center">
+        <div className="mb-8 w-full border border-brand-white/10 bg-brand-navy-deep/40 px-4 py-5">
           <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-brand-slate">
             Operated for
           </p>
           <div className="mt-3 flex flex-col items-center">
-            <BlacklineMark size={36} className="text-brand-gold" />
-            <p className="mt-2.5 font-serif text-xs font-semibold tracking-[0.2em] text-brand-gold">
+            <BlacklineMark size={56} className="text-brand-gold" />
+            <p className="mt-3 font-serif text-sm font-semibold tracking-[0.22em] text-brand-gold">
               BLACKLINE
             </p>
             <p className="mt-1 font-serif text-[9px] font-semibold uppercase tracking-[0.2em] text-brand-white/70">
@@ -89,12 +89,12 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <div className="hairline mb-8" />
+        <div className="hairline mb-8 w-full" />
 
         {idleNotice ? (
           <ErrorBanner
             message="Signed out after 5 minutes of inactivity. Sign in again to continue."
-            className="mb-6"
+            className="mb-6 w-full text-left"
           />
         ) : null}
 
@@ -102,7 +102,7 @@ export default function LoginForm() {
           <ErrorBanner
             message={error}
             onDismiss={() => setError("")}
-            className="mb-6"
+            className="mb-6 w-full text-left"
           />
         ) : null}
 
@@ -110,7 +110,7 @@ export default function LoginForm() {
           method="post"
           action="#"
           onSubmit={handleSubmit(onSubmit)}
-          className="space-y-5"
+          className="w-full space-y-5 text-left"
         >
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

@@ -7,8 +7,8 @@ type Props = {
 };
 
 /**
- * Blackline datum mark — a framed horizon and plumb meeting at the origin.
- * Uses currentColor so it reads gold on navy or gold on ivory stationery.
+ * Blackline monogram — a constructed B whose waist is the black line.
+ * The line runs through the seal and out the sides.
  */
 export function BlacklineMark({
   size = 40,
@@ -25,32 +25,40 @@ export function BlacklineMark({
       role="img"
       aria-label={title}
     >
-      <rect
-        x="6"
-        y="6"
-        width="68"
-        height="68"
+      <circle
+        cx="40"
+        cy="40"
+        r="36"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.5"
+        strokeWidth="1.2"
+      />
+      <circle
+        cx="40"
+        cy="40"
+        r="32.25"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.4"
       />
       <line
-        x1="16"
-        y1="50"
-        x2="64"
-        y2="50"
+        x1="4"
+        y1="40"
+        x2="76"
+        y2="40"
         stroke="currentColor"
-        strokeWidth="1.75"
+        strokeWidth="1.7"
       />
-      <line
-        x1="28"
-        y1="18"
-        x2="28"
-        y2="62"
-        stroke="currentColor"
-        strokeWidth="1.75"
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M26 17h21.5c8.2 0 13.1 4.4 13.1 11.1 0 5.1-3.2 8.8-9.6 10.1h-25V17zm7.4 6.2v8.8h13.2c4.3 0 6.5-2 6.5-4.5s-2.1-4.3-6.2-4.3H33.4z"
       />
-      <circle cx="28" cy="50" r="2.6" fill="currentColor" />
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M26 42.8h23.2c9.1 0 14.3 4.8 14.3 11.6 0 7.4-5.8 10.6-14.8 10.6H26V42.8zm7.4 6.1v10h15.1c5.1 0 7.8-2.3 7.8-5.1 0-2.9-2.6-4.9-7.6-4.9H33.4z"
+      />
     </svg>
   );
 }
