@@ -7,6 +7,6 @@
     <path fill="#C6A85B" stroke="none" d="M71.27 15.23V16.33H78.45V69.75H71.27V70.84H120.78V53.19H119.77Q118.75 57.72 116.92 60.89Q115.08 64.05 112.78 66.04Q110.47 68.03 107.86 68.89Q105.24 69.75 102.66 69.75H89.78V16.33H96.96V15.23Z"/>
   </g>
   <text x="168" y="78" font-family="Times New Roman, Times, serif" font-size="28" font-weight="700" letter-spacing="6" fill="#0F1C2E">BLACKLINE</text>
-  <text x="168" y="102" font-family="Times New Roman, Times, serif" font-size="11" font-weight="600" letter-spacing="3.2" fill="#4A5560">PUBLIC ADJUSTERS LLC</text>
+  <text x="168" y="92" font-family="Times New Roman, Times, serif" font-size="11" font-weight="600" letter-spacing="3.2" fill="#4A5560">PUBLIC ADJUSTERS LLC</text>
   <line x1="8" y1="132" x2="712" y2="132" stroke="#C6A85B" stroke-width="1"/>
 </svg>

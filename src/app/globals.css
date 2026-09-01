@@ -99,8 +99,25 @@
     color: #0f1c2e;
   }
 
-  .doc-preview p {
+  .doc-preview p,
+  .doc-preview .doc-body {
     @apply mb-4 whitespace-pre-wrap;
+  }
+
+  .doc-preview .doc-date {
+    @apply mb-6 text-center tracking-wide;
+  }
+
+  .doc-preview .doc-address {
+    @apply mb-4 whitespace-pre-wrap;
+  }
+
+  .doc-preview .doc-matter {
+    @apply mx-auto mb-7 max-w-md whitespace-pre-wrap border border-[#C6A85B] px-4 py-3.5 text-center leading-snug;
+  }
+
+  .doc-preview .doc-signoff {
+    @apply mt-10 whitespace-pre-wrap text-center;
   }
 
   .merge-field {

@@ -11,7 +11,7 @@ export function Letterhead({ className }: { className?: string }) {
           <p className="font-serif text-[1.55rem] font-bold leading-none tracking-[0.22em] text-[#0F1C2E] sm:text-[1.7rem]">
             BLACKLINE
           </p>
-          <p className="mt-1.5 font-serif text-[10px] font-semibold uppercase tracking-[0.22em] text-[#0F1C2E]/65">
+          <p className="mt-0.5 font-serif text-[10px] font-semibold uppercase leading-none tracking-[0.22em] text-[#0F1C2E]/65">
             Public Adjusters LLC
           </p>
         </div>

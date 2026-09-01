@@ -42,11 +42,74 @@ function letterFooterHtml(): string {
 </div>`;
 }
 
-function bodyHtml(body: string): string {
-  return stripLegacyFirmHeader(body)
+export type LetterSection = {
+  kind: "date" | "address" | "matter" | "body" | "signoff";
+  text: string;
+};
+
+const DATE_RE =
+  /^(?:\{\{today\}\}|(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}|\d{1,2}\/\d{1,2}\/\d{2,4})$/i;
+const MATTER_RE =
+  /^(Re:|Insured:|Client:|Policy(?:\s+No\.?)?:|Claim(?:\s+No\.?)?:|Carrier Claim:|Date:|Date of Loss:|Loss Location:|Loss:|Our File:|Blackline File:|Location:|File:|DOL )/i;
+const SIGNOFF_RE =
+  /^(Respectfully|Sincerely|Very truly yours|Yours truly|Best regards)\b/i;
+const SIG_LINE_RE =
+  /^(Client signature|Signature:|Assignor:|Print name:)/i;
+
+export function layoutLetterSections(body: string): LetterSection[] {
+  const paras = stripLegacyFirmHeader(body)
+    .trim()
     .split(/\n{2,}/)
-    .map((para) => `<p>${escapeHtml(para).replace(/\n/g, "<br/>")}</p>`)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const sections: LetterSection[] = [];
+  let i = 0;
+  const firstLine = paras[0]?.split("\n")[0]?.trim() ?? "";
+  if (paras[0] && DATE_RE.test(firstLine) && !paras[0].includes("\n")) {
+    sections.push({ kind: "date", text: paras[0] });
+    i = 1;
+  }
+
+  let signAt = paras.findIndex((p, idx) => idx >= i && SIGNOFF_RE.test(p));
+  if (signAt < 0) {
+    signAt = paras.findIndex((p, idx) => idx >= i && SIG_LINE_RE.test(p));
+  }
+
+  const middle = signAt >= 0 ? paras.slice(i, signAt) : paras.slice(i);
+  const tail = signAt >= 0 ? paras.slice(signAt) : [];
+
+  for (const para of middle) {
+    const lines = para.split("\n");
+    const matterIdx = lines.findIndex((l) => MATTER_RE.test(l.trim()));
+    if (matterIdx >= 0) {
+      const addr = lines.slice(0, matterIdx).join("\n").trim();
+      const matter = lines.slice(matterIdx).join("\n").trim();
+      if (addr) sections.push({ kind: "address", text: addr });
+      if (matter) sections.push({ kind: "matter", text: matter });
+    } else {
+      sections.push({ kind: "body", text: para });
+    }
+  }
+
+  if (tail.length) {
+    sections.push({ kind: "signoff", text: tail.join("\n\n") });
+  }
+
+  return sections;
+}
+
+export function letterSectionsHtml(sections: LetterSection[]): string {
+  return sections
+    .map(
+      (s) =>
+        `<div class="doc-${s.kind}">${escapeHtml(s.text).replace(/\n/g, "<br/>")}</div>`
+    )
     .join("\n");
+}
+
+function bodyHtml(body: string): string {
+  return letterSectionsHtml(layoutLetterSections(body));
 }
 
 export function wrapStationeryHtml(
@@ -88,7 +151,7 @@ export function wrapStationeryHtml(
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: #4a5560;
-      padding-top: 8px;
+      padding-top: 2px;
     }
     .rule {
       height: 1px;
@@ -106,7 +169,27 @@ export function wrapStationeryHtml(
       margin: 0 0 36px;
     }
     p { margin: 0 0 1.05em; }
+    .doc-date {
+      text-align: center;
+      letter-spacing: 0.04em;
+      margin: 0 0 1.5em;
+    }
+    .doc-address { margin: 0 0 1.15em; }
+    .doc-matter {
+      text-align: center;
+      margin: 0 auto 1.7em;
+      max-width: 28em;
+      padding: 14px 16px;
+      border: 1px solid #c6a85b;
+      line-height: 1.55;
+    }
+    .doc-body { margin: 0 0 1.05em; }
+    .doc-signoff {
+      text-align: center;
+      margin: 2.4em 0 0;
+    }
     .sign {
+      text-align: center;
       margin-top: 40px;
       padding-top: 18px;
       border-top: 1px solid #c6a85b;
