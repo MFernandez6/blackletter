@@ -79,7 +79,7 @@ export default function LoginForm() {
             Operated for
           </p>
           <div className="mt-4 flex flex-col items-center">
-            <BlacklineMark size={64} className="text-brand-gold" />
+            <BlacklineMark size={52} className="text-brand-gold" />
             <p className="mt-4 font-serif text-sm font-semibold tracking-[0.28em] text-brand-gold">
               BLACKLINE
             </p>

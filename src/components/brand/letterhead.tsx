@@ -6,7 +6,7 @@ export function Letterhead({ className }: { className?: string }) {
   return (
     <header className={cn("mb-10", className)}>
       <div className="flex items-center gap-4">
-        <BlacklineMark size={48} className="text-[#C6A85B]" />
+        <BlacklineMark size={42} className="text-[#C6A85B]" />
         <div className="min-w-0">
           <p className="font-serif text-[1.55rem] font-bold leading-none tracking-[0.22em] text-[#0F1C2E] sm:text-[1.7rem]">
             BLACKLINE
