@@ -95,8 +95,9 @@
   }
 
   .doc-preview {
-    @apply px-10 py-12 font-serif text-[15px] leading-[1.7];
+    @apply font-serif text-[15px] leading-[1.7];
     color: #0f1c2e;
+    padding: 1in;
   }
 
   .doc-preview p,
@@ -165,6 +166,10 @@
 }
 
 @media print {
+  @page {
+    margin: 1in;
+  }
+
   header,
   .no-print {
     display: none !important;
@@ -177,6 +182,10 @@
 
   main {
     max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .doc-preview {
     padding: 0 !important;
   }
 }

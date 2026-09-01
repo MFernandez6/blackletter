@@ -1,6 +1,8 @@
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const DRIVE_UPLOAD = "https://www.googleapis.com/upload/drive/v3/files";
 const DRIVE_API = "https://www.googleapis.com/drive/v3";
+const DOCS_API = "https://docs.googleapis.com/v1/documents";
+const INCH_PT = 72;
 const DOC_MIME = "application/vnd.google-apps.document";
 const FOLDER_MIME = "application/vnd.google-apps.folder";
 const SCOPES = [
@@ -217,6 +219,29 @@ async function uploadGoogleDoc(opts: {
   return (await res.json()) as { id: string; webViewLink?: string; name?: string };
 }
 
+async function setInchPageMargins(documentId: string) {
+  const margin = { magnitude: INCH_PT, unit: "PT" };
+  await driveFetch(`${DOCS_API}/${documentId}:batchUpdate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      requests: [
+        {
+          updateDocumentStyle: {
+            documentStyle: {
+              marginTop: margin,
+              marginBottom: margin,
+              marginLeft: margin,
+              marginRight: margin,
+            },
+            fields: "marginTop,marginBottom,marginLeft,marginRight",
+          },
+        },
+      ],
+    }),
+  });
+}
+
 async function shareWithSigner(opts: {
   fileId: string;
   email: string;
@@ -266,6 +291,11 @@ export async function sendViaGoogleWorkspace(opts: {
     html: opts.html,
     claimNumber: opts.claimNumber,
   });
+  try {
+    await setInchPageMargins(file.id);
+  } catch {
+    /* Google Docs already defaults to 1in; do not block send. */
+  }
   await shareWithSigner({
     fileId: file.id,
     email: opts.recipientEmail,
