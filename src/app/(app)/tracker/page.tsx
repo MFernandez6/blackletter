@@ -16,7 +16,7 @@ export default async function TrackerPage() {
     <div className="space-y-8">
       <div>
         <p className="eyebrow">Status tracker</p>
-        <h1 className="mt-2 font-serif text-2xl tracking-[0.1em] text-brand-white">
+        <h1 className="mt-2 font-serif text-3xl text-brand-gold">
           Draft · awaiting signature · executed
         </h1>
       </div>

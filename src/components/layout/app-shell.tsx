@@ -31,7 +31,7 @@ export function AppShell({ children, user }: AppShellProps) {
           <div className="flex min-w-0 items-center gap-6 sm:gap-10">
             <Link href="/dashboard" className="group shrink-0">
               <div className="flex flex-col leading-none">
-                <BlackletterMark className="font-serif text-xl font-bold tracking-[0.16em] text-brand-letter-soft sm:text-2xl" />
+                <BlackletterMark className="font-serif text-xl font-bold tracking-[0.2em] text-brand-gold sm:text-2xl" />
                 <span className="mt-1.5 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-brand-slate">
                   For Blackline Public Adjusters LLC
                 </span>
@@ -45,8 +45,8 @@ export function AppShell({ children, user }: AppShellProps) {
                   className={cn(
                     "font-sans text-[10px] font-bold uppercase tracking-[0.2em] transition-colors",
                     pathname.startsWith(item.href)
-                      ? "text-brand-letter-soft"
-                      : "text-brand-white/70 hover:text-brand-letter-soft"
+                      ? "text-brand-gold"
+                      : "text-brand-white/70 hover:text-brand-gold"
                   )}
                 >
                   {item.label}
@@ -79,7 +79,7 @@ export function AppShell({ children, user }: AppShellProps) {
               className={cn(
                 "shrink-0 font-sans text-[10px] font-bold uppercase tracking-[0.2em]",
                 pathname.startsWith(item.href)
-                  ? "text-brand-letter-soft"
+                  ? "text-brand-gold"
                   : "text-brand-white/70"
               )}
             >

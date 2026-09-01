@@ -70,8 +70,9 @@ const config: Config = {
           navy: "#0F1C2E",
           "navy-deep": "#020617",
           gold: "#C6A85B",
-          letter: "#7E93A8",
-          "letter-soft": "#9AADC0",
+          amber: "#E8B84A",
+          letter: "#C6A85B",
+          "letter-soft": "#C6A85B",
           white: "#F4F4F4",
           slate: "#8B95A5",
         },
@@ -92,7 +93,8 @@ const config: Config = {
         lg: "none",
         xl: "none",
         "2xl": "none",
-        letter: "0 0 24px rgba(126, 147, 168, 0.1)",
+        gold: "0 0 24px rgba(198, 168, 91, 0.12)",
+        letter: "0 0 24px rgba(198, 168, 91, 0.12)",
       },
       keyframes: {
         "fade-in": {

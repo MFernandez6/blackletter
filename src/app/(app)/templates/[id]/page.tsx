@@ -35,7 +35,7 @@ export default async function TemplateDetailPage({
           <p className="eyebrow">
             {STAGE_LABELS[template.stage as LifecycleStage]} · {template.documentType}
           </p>
-          <h1 className="mt-2 font-serif text-2xl tracking-[0.08em] text-brand-white">
+          <h1 className="mt-2 font-serif text-3xl text-brand-gold">
             {template.name}
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-brand-white/70">{template.description}</p>

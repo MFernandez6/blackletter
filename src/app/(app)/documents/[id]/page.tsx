@@ -40,7 +40,7 @@ export default async function DocumentPage({
           >
             Claim timeline
           </Link>
-          <h1 className="mt-3 font-serif text-2xl tracking-[0.08em] text-brand-white">
+          <h1 className="mt-3 font-serif text-3xl text-brand-gold">
             {doc.title}
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-3">

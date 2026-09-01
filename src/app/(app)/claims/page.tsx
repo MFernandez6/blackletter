@@ -16,7 +16,7 @@ export default async function ClaimsPage() {
     <div className="space-y-8">
       <div>
         <p className="eyebrow">Files</p>
-        <h1 className="mt-2 font-serif text-2xl tracking-[0.1em] text-brand-white">
+        <h1 className="mt-2 font-serif text-3xl text-brand-gold">
           Per-claim document timeline
         </h1>
         <p className="mt-2 max-w-xl text-sm text-brand-white/70">

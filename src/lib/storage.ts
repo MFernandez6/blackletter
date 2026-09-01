@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
+import { wrapStationeryHtml } from "@/lib/stationery";
 
 export const LETTER_DOCS_BUCKET = "letter-documents";
 
@@ -74,39 +75,5 @@ export async function storeLetterDocument(opts: {
 }
 
 export function documentHtmlFile(title: string, body: string): Buffer {
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>${escapeHtml(title)}</title>
-  <style>
-    body { font-family: Georgia, "Times New Roman", serif; color: #1a1f26; max-width: 740px; margin: 48px auto; line-height: 1.55; }
-    h1, h2 { font-family: "Times New Roman", serif; letter-spacing: 0.04em; }
-    .meta { font-size: 12px; color: #5b6570; text-transform: uppercase; letter-spacing: 0.14em; }
-    p { margin: 0 0 1em; }
-    .sign { margin-top: 48px; padding-top: 24px; border-top: 1px solid #c5ccd3; font-size: 13px; }
-    .sign .line { margin-top: 28px; letter-spacing: 0.08em; }
-  </style>
-</head>
-<body>
-${body
-  .split(/\n{2,}/)
-  .map((para) => `<p>${escapeHtml(para).replace(/\n/g, "<br/>")}</p>`)
-  .join("\n")}
-<div class="sign">
-  <p class="meta">Signature</p>
-  <p>Sign in Google Docs with Workspace eSignature (Tools → eSignature), then notify Blackline when complete.</p>
-  <p class="line">Client signature _______________________________ Date ______________</p>
-</div>
-</body>
-</html>`;
-  return Buffer.from(html, "utf8");
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return Buffer.from(wrapStationeryHtml(title, body), "utf8");
 }

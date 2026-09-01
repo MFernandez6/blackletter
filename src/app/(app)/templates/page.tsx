@@ -25,7 +25,7 @@ export default async function TemplatesPage() {
     <div className="space-y-10">
       <div>
         <p className="eyebrow">Template library</p>
-        <h1 className="mt-2 font-serif text-2xl tracking-[0.1em] text-brand-white">
+        <h1 className="mt-2 font-serif text-3xl text-brand-gold">
           Full claim lifecycle
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brand-white/70">

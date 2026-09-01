@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ErrorBanner } from "@/components/ui/error-banner";
 import { BlackletterMark } from "@/components/brand/blackletter-mark";
+import { BlacklineMark } from "@/components/brand/blackline-mark";
 
 type LoginValues = z.infer<typeof loginSchema>;
 
@@ -56,7 +57,7 @@ export default function LoginForm() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 70% 45% at 50% -10%, rgba(126,147,168,0.12), transparent)",
+            "radial-gradient(ellipse 70% 45% at 50% -10%, rgba(232,184,74,0.1), transparent)",
         }}
       />
 
@@ -65,7 +66,7 @@ export default function LoginForm() {
           <p className="eyebrow mb-4">Contract & document generation</p>
           <BlackletterMark
             as="h1"
-            className="justify-center font-serif text-4xl font-bold tracking-[0.18em] text-brand-letter-soft sm:text-5xl"
+            className="justify-center font-serif text-4xl font-bold tracking-[0.22em] text-brand-gold sm:text-5xl"
           />
           <p className="mt-4 text-sm leading-relaxed text-brand-white/80">
             Letters of representation, PA contracts, and disclosure forms.
@@ -73,13 +74,19 @@ export default function LoginForm() {
           </p>
         </div>
 
-        <div className="mb-8 border border-brand-white/10 bg-brand-navy-deep/40 px-4 py-3 text-center">
+        <div className="mb-8 border border-brand-white/10 bg-brand-navy-deep/40 px-4 py-4 text-center">
           <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-brand-slate">
             Operated for
           </p>
-          <p className="mt-1.5 font-serif text-xs font-semibold tracking-[0.14em] text-brand-white/85">
-            BLACKLINE PUBLIC ADJUSTERS LLC
-          </p>
+          <div className="mt-3 flex flex-col items-center">
+            <BlacklineMark size={36} className="text-brand-gold" />
+            <p className="mt-2.5 font-serif text-xs font-semibold tracking-[0.2em] text-brand-gold">
+              BLACKLINE
+            </p>
+            <p className="mt-1 font-serif text-[9px] font-semibold uppercase tracking-[0.2em] text-brand-white/70">
+              Public Adjusters LLC
+            </p>
+          </div>
         </div>
 
         <div className="hairline mb-8" />

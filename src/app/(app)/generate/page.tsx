@@ -25,7 +25,7 @@ export default async function GenerateIndexPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Generate from claim</p>
-          <h1 className="mt-2 font-serif text-2xl tracking-[0.1em] text-brand-white">
+          <h1 className="mt-2 font-serif text-3xl text-brand-gold">
             Select a file
           </h1>
           <p className="mt-2 max-w-xl text-sm text-brand-white/70">

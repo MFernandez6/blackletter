@@ -59,7 +59,7 @@ export default async function GenerateClaimPage({
       <div>
         <p className="eyebrow">Generate · preview · Google Workspace</p>
         <div className="mt-2 flex flex-wrap items-end gap-4">
-          <h1 className="font-serif text-2xl tracking-[0.08em] text-brand-white">
+          <h1 className="font-serif text-3xl text-brand-gold">
             {claim.claimantFirstName} {claim.claimantLastName}
           </h1>
           <p className="font-mono text-brand-letter-soft">{claim.claimNumber}</p>

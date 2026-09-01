@@ -136,7 +136,7 @@ export function GenerateFlow({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="eyebrow">{claimNumber}</p>
-            <h2 className="mt-1 font-serif text-xl text-brand-white">
+            <h2 className="mt-1 font-serif text-xl text-brand-gold">
               {preview?.title}
             </h2>
             {dueRow?.alreadyOnFile ? (

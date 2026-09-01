@@ -12,10 +12,6 @@ export type CatalogEntry = {
   body: string;
 };
 
-const FIRM_BLOCK = `{{firm_name}}
-{{firm_address}}
-{{firm_phone}} · {{firm_email}}`;
-
 export const TEMPLATE_CATALOG: CatalogEntry[] = [
   {
     documentType: "LOR",
@@ -26,9 +22,7 @@ export const TEMPLATE_CATALOG: CatalogEntry[] = [
     aobOnly: false,
     sortOrder: 10,
     claimStatuses: ["INTAKE", "UNDER_REVIEW", "INVESTIGATION", "FILED"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -161,9 +155,7 @@ Acknowledged: {{adjuster_name}}, License {{adjuster_license}}
     aobOnly: false,
     sortOrder: 10,
     claimStatuses: ["INVESTIGATION", "FILED"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -242,9 +234,7 @@ Prepared with: {{adjuster_name}}, License {{adjuster_license}}
     aobOnly: false,
     sortOrder: 30,
     claimStatuses: ["INVESTIGATION", "FILED", "NEGOTIATING"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -280,9 +270,7 @@ Respectfully,
     aobOnly: false,
     sortOrder: 10,
     claimStatuses: ["NEGOTIATING", "DENIED", "FILED"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -318,9 +306,7 @@ Public Adjuster · License {{adjuster_license}}
     aobOnly: false,
     sortOrder: 20,
     claimStatuses: ["NEGOTIATING", "FILED"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -353,9 +339,7 @@ Please reopen the estimate, assign a supplement review, and confirm the revised 
     aobOnly: false,
     sortOrder: 30,
     claimStatuses: ["NEGOTIATING", "FILED"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{claimant_name}}
 {{claimant_mailing_address}}
@@ -386,9 +370,7 @@ Please send us the carrier's notice, the proposed date, and any document request
     aobOnly: false,
     sortOrder: 40,
     claimStatuses: ["NEGOTIATING", "DENIED"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -417,9 +399,7 @@ Please identify your appraiser in writing within the time required by the policy
     aobOnly: false,
     sortOrder: 50,
     claimStatuses: ["NEGOTIATING", "DENIED"],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -579,9 +559,7 @@ This invoice is generated when the settlement or release is executed and is link
       "FILED",
       "NEGOTIATING",
     ],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -616,9 +594,7 @@ Please confirm the extended date in writing and continue to direct correspondenc
       "DENIED",
       "CLOSED",
     ],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{carrier_name}}
 Attn: {{desk_examiner_name}}
@@ -654,9 +630,7 @@ The carrier should resume direct communication with the insured at {{claimant_em
       "NEGOTIATING",
       "SETTLED",
     ],
-    body: `${FIRM_BLOCK}
-
-{{today}}
+    body: `{{today}}
 
 {{claimant_name}}
 {{claimant_mailing_address}}
