@@ -104,6 +104,11 @@
     @apply mb-4 whitespace-pre-wrap;
   }
 
+  .doc-preview header p,
+  .doc-preview footer p {
+    margin: 0;
+  }
+
   .doc-preview .doc-date {
     @apply mb-6 text-center tracking-wide;
   }

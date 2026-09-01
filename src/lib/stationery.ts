@@ -138,21 +138,22 @@ export function wrapStationeryHtml(
     .lh { border-collapse: collapse; margin: 0 0 6px; }
     .word {
       font-family: "Times New Roman", Times, serif;
-      font-size: 34px;
+      font-size: 52px;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.04em;
       color: #0f1c2e;
-      line-height: 0.82;
+      line-height: 1;
+      margin: 0;
     }
     .sub {
       font-family: "Times New Roman", Times, serif;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: #4a5560;
       padding-top: 0;
-      margin-top: 1px;
+      margin: -6px 0 0;
       line-height: 1;
     }
     .rule {
