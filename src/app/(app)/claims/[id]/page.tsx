@@ -13,11 +13,24 @@ export const dynamic = "force-dynamic";
 
 export default async function ClaimTimelinePage({
   params,
+  searchParams,
 }: {
   params: { id: string };
+  searchParams?: { claimId?: string };
 }) {
-  const claim = await prisma.claimMirror.findUnique({
-    where: { id: params.id },
+  const ref = decodeURIComponent(params.id);
+  const boxId = searchParams?.claimId?.trim();
+  const claim = await prisma.claimMirror.findFirst({
+    where: {
+      OR: [
+        { id: ref },
+        { blackboxClaimId: ref },
+        { claimNumber: ref },
+        ...(boxId
+          ? [{ id: boxId }, { blackboxClaimId: boxId }]
+          : []),
+      ],
+    },
     include: {
       documents: {
         orderBy: { generatedAt: "asc" },
