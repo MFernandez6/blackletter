@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
-import { prisma } from "@/lib/prisma";
+import { findClaimMirror } from "@/lib/claim-mirror";
 import { nextDocumentForClaim } from "@/lib/next-document";
 import { DOCUMENT_TYPE_LABELS, STAGE_LABELS } from "@/lib/constants";
 import { parseJson } from "@/lib/utils";
@@ -20,28 +20,7 @@ export default async function ClaimTimelinePage({
 }) {
   const ref = decodeURIComponent(params.id);
   const boxId = searchParams?.claimId?.trim();
-  const claim = await prisma.claimMirror.findFirst({
-    where: {
-      OR: [
-        { id: ref },
-        { blackboxClaimId: ref },
-        { claimNumber: ref },
-        ...(boxId
-          ? [{ id: boxId }, { blackboxClaimId: boxId }]
-          : []),
-      ],
-    },
-    include: {
-      documents: {
-        orderBy: { generatedAt: "asc" },
-        include: {
-          templateVersion: { select: { version: true } },
-          generatedBy: { select: { name: true } },
-          signatureRequests: { orderBy: { createdAt: "desc" }, take: 1 },
-        },
-      },
-    },
-  });
+  const claim = await findClaimMirror({ ref, boxId, syncOnMiss: true });
   if (!claim) notFound();
 
   const suggestion = await nextDocumentForClaim({

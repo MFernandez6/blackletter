@@ -41,14 +41,19 @@ function splitName(full: string | undefined): { first: string; last: string } {
   return { first: parts[0], last: parts.slice(1).join(" ") };
 }
 
+/** Ledger export accepts BLACKLEDGER_API_KEY; suite apps may set BLACKBOX_API_KEY instead. */
+export function blackboxServiceKey(): string | undefined {
+  return process.env.BLACKBOX_API_KEY?.trim() || process.env.BLACKLEDGER_API_KEY?.trim();
+}
+
 export async function pullBlackboxClaims(): Promise<{
   ok: boolean;
   dryRun: boolean;
   upserted: number;
   error?: string;
 }> {
-  const dryRun =
-    process.env.BLACKBOX_DRY_RUN === "1" || !process.env.BLACKBOX_API_KEY;
+  const serviceKey = blackboxServiceKey();
+  const dryRun = process.env.BLACKBOX_DRY_RUN === "1" || !serviceKey;
   if (dryRun) {
     return { ok: true, dryRun: true, upserted: 0 };
   }
@@ -59,7 +64,7 @@ export async function pullBlackboxClaims(): Promise<{
   try {
     const res = await fetch(`${base}/api/ledger/claims`, {
       headers: {
-        Authorization: `Bearer ${process.env.BLACKBOX_API_KEY}`,
+        Authorization: `Bearer ${serviceKey}`,
         Accept: "application/json",
       },
     });
