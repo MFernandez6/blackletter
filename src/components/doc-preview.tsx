@@ -1,4 +1,4 @@
-import { LetterFooter, Letterhead } from "@/components/brand/letterhead";
+import { LetterFooter, LetterSeal, Letterhead } from "@/components/brand/letterhead";
 import { layoutLetterSections, matterBlockHtml } from "@/lib/stationery";
 import { highlightMergeFields } from "@/lib/merge";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,7 @@ export function DocPreview({
     <div className={cn("doc-sheet doc-preview min-h-[480px]", className)}>
       <Letterhead />
       <div dangerouslySetInnerHTML={{ __html: html }} />
+      {sections.some((s) => s.kind === "signoff") ? <LetterSeal /> : null}
       <LetterFooter />
     </div>
   );
