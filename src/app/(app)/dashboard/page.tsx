@@ -59,7 +59,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-10">
       {loadError ? (
-        <div className="border border-denied/40 bg-denied-muted px-4 py-3 text-sm text-denied-soft">
+        <div className="rounded-xl border border-denied/40 bg-denied-muted px-4 py-3 text-sm text-denied-soft">
           {loadError}
         </div>
       ) : null}
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
           { label: "Awaiting signature", value: awaiting },
           { label: "Executed", value: executed },
         ].map((kpi) => (
-          <div key={kpi.label} className="border border-brand-white/10 px-4 py-4">
+          <div key={kpi.label} className="border border-brand-gold/15 px-4 py-4 rounded-2xl">
             <p className="eyebrow">{kpi.label}</p>
             <p className="mt-2 font-serif text-3xl text-brand-letter-soft">{kpi.value}</p>
           </div>
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
 
       <section>
         <p className="eyebrow mb-3">Due next</p>
-        <div className="border border-brand-white/10">
+        <div className="border border-brand-gold/15 rounded-2xl">
           {due.length === 0 ? (
             <p className="px-4 py-8 text-sm text-brand-slate">
               No required documents outstanding on mirrored files.
@@ -158,7 +158,7 @@ async function RecentDocs() {
     return <p className="text-sm text-brand-slate">Nothing generated yet.</p>;
   }
   return (
-    <div className="border border-brand-white/10">
+    <div className="border border-brand-gold/15 rounded-2xl">
       {docs.map((d) => (
         <Link
           key={d.id}

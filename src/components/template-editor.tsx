@@ -66,7 +66,7 @@ export function TemplateEditor({
               key={key}
               type="button"
               onClick={() => insertField(key)}
-              className="border border-brand-letter/30 bg-brand-letter/10 px-2 py-1 font-mono text-[10px] text-brand-letter-soft hover:bg-brand-letter/20"
+              className="rounded-md border border-brand-letter/30 bg-brand-letter/10 px-2 py-1 font-mono text-[10px] text-brand-letter-soft hover:bg-brand-letter/20"
               title={MERGE_FIELD_HELP[key]}
             >
               {`{{${key}}}`}
@@ -83,7 +83,7 @@ export function TemplateEditor({
           Detected fields: {fields.length ? fields.map((f) => `{{${f}}}`).join("  ") : "none"}
         </p>
         {canPublish ? (
-          <div className="space-y-3 border border-brand-white/10 p-4">
+          <div className="space-y-3 border border-brand-gold/15 p-4 rounded-2xl">
             <p className="eyebrow">New version (compliance trail)</p>
             <p className="text-sm text-brand-white/70">
               Saving never overwrites v{currentVersion}. The signed copy on every

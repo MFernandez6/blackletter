@@ -42,7 +42,7 @@ export default async function TemplateVersionsPage({
 
       <div className="space-y-8">
         {template.versions.map((v) => (
-          <article key={v.id} className="border border-brand-white/10">
+          <article key={v.id} className="border border-brand-gold/15 rounded-2xl">
             <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-brand-white/10 px-4 py-3">
               <div>
                 <p className="font-mono text-sm text-brand-letter-soft">v{v.version}</p>

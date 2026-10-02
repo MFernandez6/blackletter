@@ -49,7 +49,7 @@ export default async function TemplateDetailPage({
         {fields.map((key) => (
           <span
             key={key}
-            className="border border-brand-letter/30 bg-brand-letter/10 px-2 py-1 font-mono text-[11px] text-brand-letter-soft"
+            className="rounded-md border border-brand-letter/30 bg-brand-letter/10 px-2 py-1 font-mono text-[11px] text-brand-letter-soft"
             title={MERGE_FIELD_HELP[key]}
           >
             {`{{${key}}}`}

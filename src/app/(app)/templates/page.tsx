@@ -48,7 +48,7 @@ export default async function TemplatesPage() {
                 <Link
                   key={t.id}
                   href={`/templates/${t.id}`}
-                  className="border border-brand-white/10 p-4 hover:border-brand-letter/40 hover:bg-brand-white/5"
+                  className="border border-brand-gold/15 p-4 hover:border-brand-letter/40 hover:bg-brand-white/5 rounded-2xl"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <h2 className="font-serif text-lg text-brand-white">{t.name}</h2>

@@ -66,7 +66,7 @@ export default async function DocumentPage({
       </div>
 
       {doc.signatureRequests.length > 0 ? (
-        <section className="border border-brand-white/10 p-4">
+        <section className="border border-brand-gold/15 p-4 rounded-2xl">
           <p className="eyebrow mb-3">Google Workspace</p>
           {doc.signatureRequests.map((r) => (
             <div key={r.id} className="text-sm text-brand-white/80">

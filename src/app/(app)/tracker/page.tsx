@@ -30,7 +30,7 @@ export default async function TrackerPage() {
           const label =
             status === "sent" ? "Awaiting signature" : DOC_STATUS_LABELS[status];
           return (
-            <section key={status} className="border border-brand-white/10">
+            <section key={status} className="border border-brand-gold/15 rounded-2xl">
               <header className="border-b border-brand-white/10 px-4 py-3">
                 <p className="eyebrow">{label}</p>
                 <p className="mt-1 font-serif text-2xl text-brand-letter-soft">

@@ -53,15 +53,8 @@ export default function LoginForm() {
 
   return (
     <div className="relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden px-5 py-12 sm:px-6">
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 45% at 50% -10%, rgba(232,184,74,0.1), transparent)",
-        }}
-      />
 
-      <div className="relative mx-auto flex w-full max-w-[21rem] flex-col items-center text-center sm:max-w-sm">
+      <div className="relative mx-auto flex w-full max-w-[21rem] animate-fade-up motion-reduce:animate-none flex-col items-center text-center sm:max-w-sm">
         <div className="mb-8 flex w-full flex-col items-center">
           <p className="eyebrow mb-4">Contract & document generation</p>
           <BlackletterMark
@@ -74,7 +67,7 @@ export default function LoginForm() {
           </p>
         </div>
 
-        <div className="mb-8 w-full border border-brand-white/10 bg-brand-navy-deep/40 px-4 py-6">
+        <div className="mb-8 w-full border border-brand-gold/15 bg-brand-navy/40 px-4 py-6 rounded-2xl">
           <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-brand-slate">
             Operated for
           </p>

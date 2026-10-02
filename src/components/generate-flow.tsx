@@ -86,7 +86,7 @@ export function GenerateFlow({
           <button
             type="button"
             onClick={() => setSelected(suggestion.next!.documentType)}
-            className="w-full border border-brand-letter/40 bg-brand-letter/10 p-3 text-left"
+            className="w-full rounded-2xl border border-brand-letter/40 bg-brand-letter/10 p-3 text-left"
           >
             <p className="font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-brand-letter-soft">
               Due now

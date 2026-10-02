@@ -36,7 +36,7 @@ export default async function GenerateIndexPage() {
         <SyncButton />
       </div>
 
-      <div className="border border-brand-white/10">
+      <div className="border border-brand-gold/15 rounded-2xl">
         {claims.map((c, i) => {
           const next = suggestions[i]?.next;
           return (

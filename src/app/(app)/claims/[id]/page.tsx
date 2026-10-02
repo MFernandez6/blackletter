@@ -64,7 +64,7 @@ export default async function ClaimTimelinePage({
       </div>
 
       {suggestion?.next ? (
-        <div className="border border-brand-letter/40 bg-brand-letter/10 px-4 py-4">
+        <div className="rounded-2xl border border-brand-letter/40 bg-brand-letter/10 px-4 py-4">
           <p className="eyebrow">Due next</p>
           <p className="mt-2 font-serif text-lg text-brand-white">{suggestion.next.name}</p>
           <p className="mt-1 text-sm text-brand-white/70">{suggestion.next.reason}</p>
@@ -72,7 +72,7 @@ export default async function ClaimTimelinePage({
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <section className="border border-brand-white/10 p-4 lg:col-span-2">
+        <section className="border border-brand-gold/15 p-4 lg:col-span-2 rounded-2xl">
           <p className="eyebrow mb-4">BLACKLETTER trail</p>
           {claim.documents.length === 0 ? (
             <p className="text-sm text-brand-slate">No documents generated on this file yet.</p>
@@ -103,7 +103,7 @@ export default async function ClaimTimelinePage({
         </section>
 
         <aside className="space-y-4">
-          <div className="border border-brand-white/10 p-4">
+          <div className="border border-brand-gold/15 p-4 rounded-2xl">
             <p className="eyebrow mb-3">Already on file (BLACKGATE)</p>
             {intake.length === 0 ? (
               <p className="text-sm text-brand-slate">
@@ -123,7 +123,7 @@ export default async function ClaimTimelinePage({
               </ul>
             )}
           </div>
-          <div className="border border-brand-white/10 p-4">
+          <div className="border border-brand-gold/15 p-4 rounded-2xl">
             <p className="eyebrow mb-3">BLACKMIRROR scope</p>
             <p className="text-sm text-brand-white/80">
               {scope.photoCount ?? 0} photographs
@@ -132,7 +132,7 @@ export default async function ClaimTimelinePage({
               {scope.scopeSummary || "No inspection scope cached."}
             </p>
           </div>
-          <div className="border border-brand-white/10 p-4">
+          <div className="border border-brand-gold/15 p-4 rounded-2xl">
             <p className="eyebrow mb-3">Stage map</p>
             <ul className="space-y-2 text-sm">
               {suggestion?.due.map((d) => (
