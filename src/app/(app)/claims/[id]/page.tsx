@@ -57,6 +57,9 @@ export default async function ClaimTimelinePage({
               </a>
             </Button>
           ) : null}
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/claims/${claim.id}/summary-report`}>Summary report</Link>
+          </Button>
           <Button asChild size="sm" variant="solid">
             <Link href={`/generate/${claim.id}`}>Generate</Link>
           </Button>
