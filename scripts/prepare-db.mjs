@@ -1,24 +1,32 @@
 /**
- * Vercel / CI: materialize a seeded SQLite file so serverless instances
- * have staff + templates. Skipped when DATABASE_URL is Postgres.
+ * Build-time DB prep.
+ * - Postgres: migrate deploy + non-destructive bootstrap (staff + templates)
+ * - Legacy sqlite URL: refused — BLACKLETTER is Postgres-only
  */
 import { execSync } from "node:child_process";
 
 const url = process.env.DATABASE_URL?.trim() ?? "";
-if (/^postgres(ql)?:\/\//i.test(url)) {
-  console.log("prepare-db: Postgres URL set — skipping local sqlite seed.");
-  process.exit(0);
+
+if (!url) {
+  console.error("prepare-db: DATABASE_URL is required.");
+  process.exit(1);
 }
 
-process.env.DATABASE_URL = url || "file:./dev.db";
-process.env.ALLOW_DESTRUCTIVE_SEED = "1";
+if (!/^postgres(ql)?:\/\//i.test(url)) {
+  console.error(
+    "prepare-db: BLACKLETTER requires a Postgres DATABASE_URL (shared Supabase). SQLite is no longer supported."
+  );
+  process.exit(1);
+}
 
-console.log("prepare-db: pushing sqlite schema and seeding…");
-execSync("npx prisma db push --skip-generate --accept-data-loss", {
+console.log("prepare-db: applying Postgres migrations…");
+execSync("npx prisma migrate deploy", {
   stdio: "inherit",
   env: process.env,
 });
-execSync("npx prisma db seed", {
+
+console.log("prepare-db: running non-destructive bootstrap…");
+execSync("npx tsx prisma/bootstrap.ts", {
   stdio: "inherit",
   env: process.env,
 });

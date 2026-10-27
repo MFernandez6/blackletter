@@ -8,11 +8,12 @@
     "postinstall": "prisma generate",
     "start": "next start -p 3004",
     "lint": "next lint",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "db:reset": "ALLOW_DESTRUCTIVE_SEED=1 prisma db push --force-reset && ALLOW_DESTRUCTIVE_SEED=1 prisma db seed"
+    "db:reset": "ALLOW_DESTRUCTIVE_SEED=1 prisma db push --force-reset && ALLOW_DESTRUCTIVE_SEED=1 prisma db seed",
+    "db:bootstrap": "tsx prisma/bootstrap.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -10,15 +10,19 @@
 // ClaimMirror.status except via BLACKBOX sync.
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas  = ["blackletter"]
 }
 
-// SQLite has no native enums. Constrained string values live in src/lib/types.ts.
+// Constrained string values live in src/lib/types.ts.
+// Tables live in schema "blackletter" so they never collide with BLACKBOX/GATE/LEDGER.
 
 model Staff {
   id           String   @id @default(cuid())
@@ -37,6 +41,7 @@ model Staff {
   documentsGenerated  GeneratedDocument[] @relation("DocumentGenerator")
   signatureRequests   SignatureRequest[] @relation("SignatureRequester")
   auditEvents         LetterAuditEvent[] @relation("AuditActor")
+  @@schema("blackletter")
 }
 
 /// Read-only mirror of a BLACKBOX claim used to populate merge fields.
@@ -88,6 +93,7 @@ model ClaimMirror {
 
   @@index([status])
   @@index([updatedAt])
+  @@schema("blackletter")
 }
 
 model DocumentTemplate {
@@ -114,6 +120,7 @@ model DocumentTemplate {
   stageMap       DocumentStageMap?
 
   @@index([stage, isActive])
+  @@schema("blackletter")
 }
 
 /// Append-only. Never update body in place — create a new row and point
@@ -135,6 +142,7 @@ model TemplateVersion {
 
   @@unique([templateId, version])
   @@index([templateId, createdAt])
+  @@schema("blackletter")
 }
 
 /// Maps each document type to claim-lifecycle placement.
@@ -152,6 +160,7 @@ model DocumentStageMap {
   templateId    String?  @unique
 
   template DocumentTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  @@schema("blackletter")
 }
 
 model GeneratedDocument {
@@ -194,6 +203,7 @@ model GeneratedDocument {
   @@index([claimNumber])
   @@index([status, documentType])
   @@index([templateVersionId])
+  @@schema("blackletter")
 }
 
 model SignatureRequest {
@@ -220,6 +230,7 @@ model SignatureRequest {
 
   @@index([generatedDocumentId])
   @@index([status])
+  @@schema("blackletter")
 }
 
 /// Append-only status trail for a signature request
@@ -233,6 +244,7 @@ model SignatureEvent {
   request SignatureRequest @relation(fields: [signatureRequestId], references: [id], onDelete: Cascade)
 
   @@index([signatureRequestId, receivedAt])
+  @@schema("blackletter")
 }
 
 model LetterAuditEvent {
@@ -250,4 +262,5 @@ model LetterAuditEvent {
   @@index([createdAt])
   @@index([actorId])
   @@index([action])
+  @@schema("blackletter")
 }
