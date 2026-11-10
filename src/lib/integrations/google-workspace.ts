@@ -302,12 +302,32 @@ export async function sendViaGoogleWorkspace(opts: {
     recipientName: opts.recipientName,
     title: opts.title,
   });
+  try {
+    await driveFetch(
+      `${DRIVE_API}/files/${file.id}/modifyContentRestrictions?supportsAllDrives=true`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          readOnly: true,
+          reason: "Sent for review. The wording is locked.",
+        }),
+      }
+    );
+  } catch {
+    /* Reader permission already blocks edits if the lock API is unavailable. */
+  }
 
   return {
     dryRun: false,
     provider: "google_workspace",
     providerDocumentId: file.id,
-    embeddedUrl: file.webViewLink ?? `https://docs.google.com/document/d/${file.id}/edit`,
+    embeddedUrl: viewOnlyLink(file.id, file.webViewLink),
     status: "sent",
   };
+}
+
+function viewOnlyLink(fileId: string, webViewLink?: string) {
+  const raw = webViewLink ?? `https://docs.google.com/document/d/${fileId}/preview`;
+  return raw.replace(/\/edit(?=$|\?)/, "/preview");
 }

@@ -28,6 +28,7 @@ model Staff {
   id           String   @id @default(cuid())
   name         String
   email        String   @unique
+  /// Unused for login. Authentication is public."Adjuster" (lockout, MFA, session revocation).
   passwordHash String
   /// ADMIN | ADJUSTER | VIEWER
   role         String   @default("ADJUSTER")

@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
+import { contractGateProblems, rescissionTerms } from "./contract-gate";
+import { PA_CONTRACT_BODY } from "@/lib/templates/catalog";
+import { mergeTemplate, valuesFromClaim } from "@/lib/merge";
 
 vi.mock("@/lib/constants", () => ({
   FIRM: { legalName: "BLACKLINE PUBLIC ADJUSTERS LLC", address: "100 Main St, Miami, FL 33101", phone: "(305) 555-0100", email: "", website: "" },
 }));
 
-const { contractGateProblems, rescissionTerms } = await import("./contract-gate");
-const { PA_CONTRACT_BODY } = await import("@/lib/templates/catalog");
-const { mergeTemplate, valuesFromClaim } = await import("@/lib/merge");
 
 const claim = {
   claimNumber: "BL-26-0001",

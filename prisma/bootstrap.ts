@@ -1,7 +1,7 @@
 /**
  * Non-destructive production bootstrap for BLACKLETTER on Postgres.
  *
- * - Ensures Miguel exists, copying his password hash and license from public."Adjuster"
+ * - Ensures a staff profile exists. Login uses public."Adjuster", not this password.
  * - Seeds the document template catalog when the library is empty
  *
  * Safe to re-run. Never wipes data.
@@ -9,7 +9,9 @@
  *   npx tsx prisma/bootstrap.ts
  */
 
+import { randomBytes } from "crypto";
 import { PrismaClient } from "@prisma/client";
+import { hash } from "bcryptjs";
 import { TEMPLATE_CATALOG } from "../src/lib/templates/catalog";
 import { extractMergeFields } from "../src/lib/merge";
 
@@ -24,27 +26,27 @@ async function ensureMiguel() {
     return existing;
   }
 
-  let passwordHash: string | null = null;
   let name = "Miguel Fernandez";
   let licenseNumber: string | null = null;
+  let foundAdjuster = false;
   try {
     const rows = await prisma.$queryRawUnsafe<
-      Array<{ name: string; passwordHash: string; licenseNumber: string | null }>
+      Array<{ name: string; licenseNumber: string | null }>
     >(
-      `select name, "passwordHash", "licenseNumber" from public."Adjuster" where email = $1 limit 1`,
+      `select name, "licenseNumber" from public."Adjuster" where email = $1 limit 1`,
       KEEP_EMAIL
     );
     if (rows[0]) {
-      passwordHash = rows[0].passwordHash;
+      foundAdjuster = true;
       name = rows[0].name || name;
       licenseNumber = rows[0].licenseNumber;
-      console.log("Copied credentials from public.Adjuster");
+      console.log("Linked staff profile to public.Adjuster (password is not copied)");
     }
   } catch (e) {
     console.log("Adjuster lookup skipped:", (e as Error).message.slice(0, 100));
   }
 
-  if (!passwordHash) {
+  if (!foundAdjuster) {
     console.log("No BLACKBOX adjuster found for", KEEP_EMAIL, "— staff not created.");
     return null;
   }
@@ -53,7 +55,7 @@ async function ensureMiguel() {
     data: {
       name,
       email: KEEP_EMAIL,
-      passwordHash,
+      passwordHash: await hash(randomBytes(32).toString("hex"), 10),
       role: "ADMIN",
       licenseNumber,
     },

@@ -118,7 +118,7 @@ Please read this disclosure before signing the contract of employment.
 
 2. Unauthorized practice of law. Florida prohibits anyone other than a licensed attorney from practicing law. If a coverage dispute, bad-faith question, or lawsuit arises, you should consult independent counsel. We will not interpret your legal rights beyond the adjustment of the insurance claim.
 
-3. Fee. Our compensation is a contingency fee of {{contingency_fee_percent}} of amounts recovered, subject to Fla. Stat. § 626.854. You pay no fee if there is no recovery.
+3. Fee. Our compensation is a contingency fee of {{contingency_fee_percent}} of amounts recovered after the contract, and it will not exceed {{fee_cap_percent}} ({{fee_cap_basis}}). Fla. Stat. § 626.854 caps the fee at 10% on a declared-emergency claim reported within one year of the declaration, and at 20% otherwise. You pay no fee if there is no recovery. Firm: {{firm_name}}, {{firm_address}}, {{firm_phone}}.
 
 4. You remain the insured. You keep the right to communicate with your carrier. We ask that you copy us so the file stays complete.
 

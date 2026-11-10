@@ -408,7 +408,7 @@ async function main() {
   console.log("  Admin    miguel.fernandez@blacklineadjusting.com");
   console.log("  Adjuster diana.reyes@blacklineadjusting.com");
   console.log("  Viewer   viewer@blacklineadjusting.com");
-  console.log("  Password: SEED_PASSWORD");
+  console.log("  Sign in with the BLACKBOX account. Staff passwords are not accepted.");
 }
 
 main()

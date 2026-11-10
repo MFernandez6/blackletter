@@ -8,8 +8,9 @@ import { attachExecutedToBlackbox } from "@/lib/integrations/blackbox";
 import { triggerLedgerPayout } from "@/lib/integrations/blackledger";
 import { pullBlackmirrorScope } from "@/lib/integrations/blackmirror";
 import { sendViaGoogleWorkspace } from "@/lib/integrations/google-workspace";
-import { contractGateProblems } from "@/lib/compliance/contract-gate";
-import { mergeTemplate, valuesFromClaim } from "@/lib/merge";
+import { contractGateProblems, templateLanguageProblems } from "@/lib/compliance/contract-gate";
+import { extractMergeFields, mergeTemplate, valuesFromClaim } from "@/lib/merge";
+import { TEMPLATE_CATALOG } from "@/lib/templates/catalog";
 import { prisma } from "@/lib/prisma";
 import {
   generateDocumentSchema,
@@ -23,6 +24,54 @@ import type { MirrorScope } from "@/lib/types";
 export type ActionResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; error: string };
+
+/** Replace a published template that still has the old non-compliant wording. */
+async function publishCompliantLanguage(opts: {
+  templateId: string;
+  documentType: DocumentType;
+  version: { id: string; body: string; version: number };
+  staffId: string;
+}) {
+  if (templateLanguageProblems(opts.documentType, opts.version.body).length === 0) {
+    return opts.version;
+  }
+  const catalog = TEMPLATE_CATALOG.find((entry) => entry.documentType === opts.documentType);
+  if (!catalog || templateLanguageProblems(opts.documentType, catalog.body).length > 0) {
+    return opts.version;
+  }
+  const latest = await prisma.templateVersion.findFirst({
+    where: { templateId: opts.templateId },
+    orderBy: { version: "desc" },
+    select: { version: true },
+  });
+  const created = await prisma.$transaction(async (tx) => {
+    const row = await tx.templateVersion.create({
+      data: {
+        templateId: opts.templateId,
+        version: (latest?.version ?? opts.version.version) + 1,
+        body: catalog.body,
+        changeNote: "Florida contract: fee cap, fraud warning, cancellation period, and street address.",
+        createdById: opts.staffId,
+      },
+    });
+    await tx.documentTemplate.update({
+      where: { id: opts.templateId },
+      data: {
+        currentVersionId: row.id,
+        mergeFieldsJson: JSON.stringify(extractMergeFields(catalog.body)),
+      },
+    });
+    return row;
+  });
+  await logLetterAudit({
+    actorId: opts.staffId,
+    action: "TEMPLATE_VERSION",
+    entityType: "TemplateVersion",
+    entityId: created.id,
+    summary: `Published ${opts.documentType} v${created.version} to meet Florida contract rules`,
+  });
+  return created;
+}
 
 function revalidateDocs(claimId: string, docId?: string) {
   revalidatePath("/dashboard");
@@ -60,10 +109,16 @@ export async function generateDocumentAction(
     if (!template?.currentVersionId) {
       return { ok: false, error: "Template has no published version." };
     }
-    const version = await prisma.templateVersion.findUnique({
+    const loaded = await prisma.templateVersion.findUnique({
       where: { id: template.currentVersionId },
     });
-    if (!version) return { ok: false, error: "Template version missing." };
+    if (!loaded) return { ok: false, error: "Template version missing." };
+    const version = await publishCompliantLanguage({
+      templateId: template.id,
+      documentType: template.documentType as DocumentType,
+      version: loaded,
+      staffId: staff.id,
+    });
 
     const scope = await pullBlackmirrorScope({
       claimMirrorId: claim.id,

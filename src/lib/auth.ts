@@ -1,9 +1,15 @@
 import { type NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { safeEqual } from "@/lib/safe-compare";
 import { loginSchema } from "@/lib/schemas/login";
+import {
+  adjusterSessionVersion,
+  ensureStaffForAdjuster,
+  LoginError,
+  LOGIN_ERRORS,
+  verifyAdjusterLogin,
+} from "@/lib/security/adjuster-login";
 import type { StaffRole } from "@/lib/types";
 
 declare module "next-auth" {
@@ -21,6 +27,7 @@ declare module "next-auth" {
     email: string;
     name: string;
     role: StaffRole;
+    sessionVersion: number;
   }
 }
 
@@ -28,6 +35,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: StaffRole;
+    sessionVersion?: number;
     revoked?: boolean;
   }
 }
@@ -56,30 +64,31 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        otp: { label: "Authenticator code", type: "text" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        if (!parsed.success) throw new Error(LOGIN_ERRORS.invalid);
 
         try {
-          const staff = await prisma.staff.findUnique({
-            where: { email: parsed.data.email.toLowerCase() },
+          const adjuster = await verifyAdjusterLogin({
+            email: parsed.data.email,
+            password: parsed.data.password,
+            otp: credentials?.otp || null,
+            req,
           });
-
-          if (!staff || !staff.isActive) return null;
-
-          const valid = await compare(parsed.data.password, staff.passwordHash);
-          if (!valid) return null;
-
+          const staff = await ensureStaffForAdjuster(adjuster);
           return {
             id: staff.id,
             email: staff.email,
             name: staff.name,
             role: staff.role as StaffRole,
+            sessionVersion: adjuster.sessionVersion,
           };
         } catch (error) {
+          if (error instanceof LoginError) throw new Error(error.message);
           console.error("authorize failed", error);
-          return null;
+          throw new Error(LOGIN_ERRORS.invalid);
         }
       },
     }),
@@ -90,11 +99,20 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
         token.email = user.email;
+        token.sessionVersion = user.sessionVersion;
+        token.revoked = false;
+        return token;
       }
+      if (token.revoked) return token;
       const email =
         typeof token.email === "string" ? token.email.toLowerCase() : null;
       if (email) {
         try {
+          const live = await adjusterSessionVersion(email);
+          if (!live || !live.isActive || (token.sessionVersion ?? 0) !== Number(live.sessionVersion)) {
+            token.revoked = true;
+            return token;
+          }
           const staff = await prisma.staff.findFirst({
             where: { email, isActive: true },
             select: { id: true, role: true },

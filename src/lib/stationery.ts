@@ -156,7 +156,7 @@ export function letterSectionsHtml(sections: LetterSection[]): string {
     .map((s) =>
       s.kind === "matter"
         ? matterBlockHtml(s.text, escapeHtml)
-        : `<div class="doc-${s.kind}">${escapeHtml(s.text).replace(/\n/g, "<br/>")}</div>`
+        : `<div class="${/FRAUD WARNING|817\.234/i.test(s.text) ? "doc-fraud" : `doc-${s.kind}`}">${escapeHtml(s.text).replace(/\n/g, "<br/>")}</div>`
     )
     .join("\n");
 }
@@ -281,6 +281,12 @@ export function wrapStationeryHtml(
       text-transform: uppercase;
       margin: 0;
     }
+    .doc-fraud {
+      font-size: 18pt;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 1.2em 0;
+    }
     .ft-main { font-weight: 700; color: #8a7a4a; }
     .ft-sub { color: #9a8b68; margin-top: 6px; letter-spacing: 0.14em; }
   </style>
@@ -292,7 +298,7 @@ ${
   sign
     ? `<div class="sign">
   <p class="meta">Acknowledgement</p>
-  <p>Sign in Google Docs with Workspace eSignature (Tools → eSignature), then notify Blackline when complete.</p>
+  <p>This copy is view-only. The wording is locked. Sign only through the signature request your adjuster sends.</p>
   <p class="line">Client signature _______________________________ Date ______________</p>
 </div>`
     : ""
