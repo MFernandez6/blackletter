@@ -57,6 +57,10 @@ describe("contract gate", () => {
     expect(gate({ assignedAdjusterLicense: "" }).join(" ")).toMatch(/license/);
   });
 
+  it("blocks the 6-20 license on a public-adjuster contract", () => {
+    expect(gate({ assignedAdjusterLicense: "G279764" }).join(" ")).toMatch(/blocked/);
+  });
+
   it("blocks a template without the fraud warning", () => {
     const body = PA_CONTRACT_BODY.replace(/FRAUD WARNING[\s\S]*Florida Statutes\.\n/, "");
     const problems = contractGateProblems({
