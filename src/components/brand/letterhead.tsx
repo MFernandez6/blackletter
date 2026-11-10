@@ -1,4 +1,4 @@
-import { FIRM } from "@/lib/constants";
+import { FIRM, FIRM_CONTACT_LINE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { BlacklineLogo, BlacklineSeal } from "@/components/brand/blackline-mark";
 
@@ -8,7 +8,7 @@ export function Letterhead({ className }: { className?: string }) {
       <BlacklineLogo className="mx-auto w-[220px]" priority />
       <div className="mt-4 h-px bg-[#C6A85B]" />
       <p className="!m-0 mt-3 text-center font-sans text-[9px] font-bold uppercase tracking-[0.16em] text-[#8a7a4a]">
-        {FIRM.address} · {FIRM.phone} · {FIRM.email} · {FIRM.website}
+        {FIRM_CONTACT_LINE}
       </p>
     </header>
   );

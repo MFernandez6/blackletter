@@ -1,7 +1,7 @@
 /**
  * Non-destructive production bootstrap for BLACKLETTER on Postgres.
  *
- * - Ensures Miguel exists (reuses public."Adjuster" password hash when available)
+ * - Ensures Miguel exists, copying his password hash and license from public."Adjuster"
  * - Seeds the document template catalog when the library is empty
  *
  * Safe to re-run. Never wipes data.
@@ -10,12 +10,10 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs";
 import { TEMPLATE_CATALOG } from "../src/lib/templates/catalog";
 import { extractMergeFields } from "../src/lib/merge";
 
 const KEEP_EMAIL = "miguel.fernandez@blacklineadjusting.com";
-const FALLBACK_PASSWORD = "Password123!";
 
 const prisma = new PrismaClient();
 
@@ -28,25 +26,27 @@ async function ensureMiguel() {
 
   let passwordHash: string | null = null;
   let name = "Miguel Fernandez";
+  let licenseNumber: string | null = null;
   try {
     const rows = await prisma.$queryRawUnsafe<
-      Array<{ name: string; passwordHash: string }>
+      Array<{ name: string; passwordHash: string; licenseNumber: string | null }>
     >(
-      `select name, "passwordHash" from public."Adjuster" where email = $1 limit 1`,
+      `select name, "passwordHash", "licenseNumber" from public."Adjuster" where email = $1 limit 1`,
       KEEP_EMAIL
     );
     if (rows[0]) {
       passwordHash = rows[0].passwordHash;
       name = rows[0].name || name;
-      console.log("Copied password hash from public.Adjuster");
+      licenseNumber = rows[0].licenseNumber;
+      console.log("Copied credentials from public.Adjuster");
     }
   } catch (e) {
     console.log("Adjuster lookup skipped:", (e as Error).message.slice(0, 100));
   }
 
   if (!passwordHash) {
-    passwordHash = await hash(FALLBACK_PASSWORD, 10);
-    console.log("Created Miguel with fallback password — change it after login");
+    console.log("No BLACKBOX adjuster found for", KEEP_EMAIL, "— staff not created.");
+    return null;
   }
 
   const miguel = await prisma.staff.create({
@@ -55,7 +55,7 @@ async function ensureMiguel() {
       email: KEEP_EMAIL,
       passwordHash,
       role: "ADMIN",
-      licenseNumber: "W123456",
+      licenseNumber,
     },
   });
   console.log("Created staff:", miguel.email);
@@ -112,6 +112,10 @@ async function ensureTemplates(createdById: string) {
 
 async function main() {
   const miguel = await ensureMiguel();
+  if (!miguel) {
+    console.log("Skipping template seed: no staff member to own it.");
+    return;
+  }
   await ensureTemplates(miguel.id);
   console.log("Bootstrap complete.");
 }

@@ -33,7 +33,13 @@ export type BlackboxClaimRow = {
   deskExaminerPhone?: string | null;
   deskExaminerEmail?: string | null;
   intakeNumber?: string | null;
+  feeCap?: { capPercent: number; emergencyCapApplies: boolean; basis: string; cite: string };
 };
+
+/** BLACKBOX decides whether the 10% emergency cap governs; older payloads fall back to the CAT flag. */
+function emergencyCapApplies(row: BlackboxClaimRow): boolean {
+  return row.feeCap ? row.feeCap.emergencyCapApplies : Boolean(row.isCatClaim);
+}
 
 function splitName(full: string | undefined): { first: string; last: string } {
   const parts = (full ?? "—").trim().split(/\s+/);
@@ -106,7 +112,7 @@ export async function pullBlackboxClaims(): Promise<{
           settlementAmount: row.settlementAmount ?? null,
           settlementDate: row.settlementDate ? new Date(row.settlementDate) : null,
           contingencyFeePercent: row.contingencyFeePercent ?? 20,
-          isCatClaim: Boolean(row.isCatClaim),
+          isCatClaim: emergencyCapApplies(row),
           assignedAdjuster: row.assignedAdjuster ?? null,
           assignedAdjusterLicense: row.assignedAdjusterLicense ?? null,
           claimantFirstName: row.claimantFirstName ?? name.first,
@@ -136,11 +142,14 @@ export async function pullBlackboxClaims(): Promise<{
           settlementAmount: row.settlementAmount ?? null,
           settlementDate: row.settlementDate ? new Date(row.settlementDate) : null,
           contingencyFeePercent: row.contingencyFeePercent ?? 20,
-          isCatClaim: Boolean(row.isCatClaim),
+          isCatClaim: emergencyCapApplies(row),
           assignedAdjuster: row.assignedAdjuster ?? null,
           assignedAdjusterLicense: row.assignedAdjusterLicense ?? null,
           claimantFirstName: row.claimantFirstName ?? name.first,
           claimantLastName: row.claimantLastName ?? name.last,
+          ...(row.claimantEmail !== undefined ? { claimantEmail: row.claimantEmail } : {}),
+          ...(row.claimantPhone !== undefined ? { claimantPhone: row.claimantPhone } : {}),
+          ...(row.claimantMailing !== undefined ? { claimantMailing: row.claimantMailing } : {}),
           intakeNumber: row.intakeNumber ?? null,
           syncedAt: new Date(),
         },

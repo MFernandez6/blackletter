@@ -254,8 +254,8 @@ async function shareWithSigner(opts: {
     emailMessage: [
       `${opts.recipientName},`,
       "",
-      `Blackline Public Adjusters has shared “${opts.title}” for your signature.`,
-      "Open the Google Doc, use eSignature (Tools → eSignature), then notify your adjuster when it is signed.",
+      `Blackline Public Adjusters has shared “${opts.title}” for your review.`,
+      "Your adjuster will send a separate signature request from Google. You can read the document now; it cannot be edited.",
     ].join("\n"),
   });
   await driveFetch(`${DRIVE_API}/files/${opts.fileId}/permissions?${params}`, {
@@ -263,7 +263,7 @@ async function shareWithSigner(opts: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       type: "user",
-      role: "writer",
+      role: "reader",
       emailAddress: opts.email,
     }),
   });

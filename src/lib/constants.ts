@@ -2,14 +2,19 @@ import type { ClaimStatus, DocumentType, LifecycleStage } from "@/lib/types";
 
 export const FIRM = {
   name: "Blackline Public Adjusters LLC",
-  legalName: "BLACKLINE PUBLIC ADJUSTERS LLC",
-  address: "Florida",
-  phone: "(800) 000-0000",
-  email: "files@blacklineadjusting.com",
-  website: "blacklineadjusting.com",
+  legalName:
+    process.env.NEXT_PUBLIC_FIRM_NAME?.trim() || "BLACKLINE PUBLIC ADJUSTERS LLC",
+  address: process.env.NEXT_PUBLIC_FIRM_ADDRESS?.trim() ?? "",
+  phone: process.env.NEXT_PUBLIC_FIRM_PHONE?.trim() ?? "",
+  email: process.env.NEXT_PUBLIC_FIRM_EMAIL?.trim() ?? "",
+  website: process.env.NEXT_PUBLIC_FIRM_WEBSITE?.trim() ?? "",
   statuteCite: "Fla. Stat. § 626.854",
   mediationCite: "Fla. Stat. § 627.7015",
 } as const;
+
+export const FIRM_CONTACT_LINE = [FIRM.address, FIRM.phone, FIRM.email, FIRM.website]
+  .filter(Boolean)
+  .join(" · ");
 
 export const STAGE_LABELS: Record<LifecycleStage, string> = {
   INTAKE_ENGAGEMENT: "Intake / engagement",

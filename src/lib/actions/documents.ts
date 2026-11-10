@@ -8,6 +8,7 @@ import { attachExecutedToBlackbox } from "@/lib/integrations/blackbox";
 import { triggerLedgerPayout } from "@/lib/integrations/blackledger";
 import { pullBlackmirrorScope } from "@/lib/integrations/blackmirror";
 import { sendViaGoogleWorkspace } from "@/lib/integrations/google-workspace";
+import { contractGateProblems } from "@/lib/compliance/contract-gate";
 import { mergeTemplate, valuesFromClaim } from "@/lib/merge";
 import { prisma } from "@/lib/prisma";
 import {
@@ -77,6 +78,19 @@ export async function generateDocumentAction(
       photoCount: mergedScope.photoCount ?? null,
     });
     const mergedBody = mergeTemplate(version.body, values);
+
+    const problems = contractGateProblems({
+      documentType: template.documentType as DocumentType,
+      templateBody: version.body,
+      mergedBody,
+      contingencyFeePercent: claim.contingencyFeePercent,
+      isEmergencyLoss: claim.isCatClaim,
+      adjusterLicense: claim.assignedAdjusterLicense,
+    });
+    if (problems.length > 0) {
+      return { ok: false, error: `Cannot generate: ${problems.join(" ")}` };
+    }
+
     const title = `${DOCUMENT_TYPE_LABELS[parsed.data.documentType as DocumentType]} — ${claim.claimNumber}`;
 
     const stored = await storeLetterDocument({
@@ -142,12 +156,16 @@ export async function sendForSignatureAction(
       include: { claim: true },
     });
     if (!doc) return { ok: false, error: "Document not found." };
+    if (doc.status !== "draft") {
+      return { ok: false, error: "Only draft documents can be sent." };
+    }
 
+    const overrideRecipient = staff.role === "ADMIN";
     const recipientName =
-      parsed.data.recipientName ??
+      (overrideRecipient ? parsed.data.recipientName : undefined) ??
       `${doc.claim.claimantFirstName} ${doc.claim.claimantLastName}`.trim();
     const recipientEmail =
-      parsed.data.recipientEmail ?? doc.claim.claimantEmail;
+      (overrideRecipient ? parsed.data.recipientEmail : undefined) ?? doc.claim.claimantEmail;
     if (!recipientEmail) {
       return { ok: false, error: "Claimant email is required to send for signature." };
     }
@@ -249,6 +267,12 @@ export async function applyExecutedStatus(
     include: { claim: true },
   });
   if (!doc) return { ok: false, error: "Document not found." };
+  if (doc.status === "executed") {
+    return { ok: true, claimMirrorId: doc.claimMirrorId, ledgerPayoutId: doc.ledgerPayoutId };
+  }
+  if (doc.status !== "sent" && doc.status !== "signed") {
+    return { ok: false, error: "Only documents sent for signature can be marked executed." };
+  }
 
   const now = new Date();
   let ledgerPayoutId = doc.ledgerPayoutId;
@@ -270,7 +294,7 @@ export async function applyExecutedStatus(
     if (!ledger.ok) {
       return { ok: false, error: ledger.error ?? "BLACKLEDGER payout failed." };
     }
-    ledgerPayoutId = ledger.payoutId ?? (ledger.dryRun ? "dry-run" : null);
+    ledgerPayoutId = ledger.payoutId ?? null;
   }
 
   const vault = await attachExecutedToBlackbox({

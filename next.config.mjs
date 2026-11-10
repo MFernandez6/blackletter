@@ -17,21 +17,40 @@ function resolveAuthUrl() {
 // (including /_not-found). Always leave a valid absolute URL.
 process.env.NEXTAUTH_URL = resolveAuthUrl();
 
-// Production NextAuth throws if secret is missing, which surfaces as an
-// opaque Server Components digest in the browser.
-if (!process.env.NEXTAUTH_SECRET?.trim()) {
-  process.env.NEXTAUTH_SECRET =
-    process.env.AUTH_SECRET?.trim() || "blackletter-set-NEXTAUTH_SECRET-in-vercel";
+if (process.env.VERCEL && !(process.env.NEXTAUTH_SECRET?.trim() || process.env.AUTH_SECRET?.trim())) {
+  throw new Error("NEXTAUTH_SECRET must be set on Vercel.");
 }
+
+const isDev = process.env.NODE_ENV !== "production";
+
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy", value: csp },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    outputFileTracingIncludes: {
-      "/*": ["./prisma/dev.db"],
-      "/api/**": ["./prisma/dev.db"],
-      "/dashboard": ["./prisma/dev.db"],
-    },
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
   },
 };
 

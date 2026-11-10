@@ -1,4 +1,4 @@
-import { FIRM } from "@/lib/constants";
+import { FIRM, FIRM_CONTACT_LINE } from "@/lib/constants";
 import { LETTERHEAD_LOGO, LETTER_SEAL } from "@/lib/brand-images";
 
 /** Standard letter page margin — preview, print, and Google Docs. */
@@ -22,7 +22,7 @@ function escapeHtml(value: string): string {
 function letterheadHtml(): string {
   return `<div class="lh"><img src="${LETTERHEAD_LOGO.src}" width="${LETTERHEAD_LOGO.width}" height="${LETTERHEAD_LOGO.height}" alt="Blackline Public Adjusters LLC" /></div>
 <div class="rule"></div>
-<p class="contact">${escapeHtml(FIRM.address)} · ${escapeHtml(FIRM.phone)} · ${escapeHtml(FIRM.email)} · ${escapeHtml(FIRM.website)}</p>`;
+<p class="contact">${escapeHtml(FIRM_CONTACT_LINE)}</p>`;
 }
 
 function sealHtml(): string {

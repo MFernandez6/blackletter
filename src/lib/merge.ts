@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { feeCapFor, rescissionTerms } from "@/lib/compliance/contract-gate";
 import { FIRM } from "@/lib/constants";
 import type { MergeValues } from "@/lib/types";
 
@@ -70,6 +71,7 @@ export type ClaimMergeSource = {
   claimantPhone: string;
   claimantMailing: string;
   contingencyFeePercent?: number | null;
+  isCatClaim?: boolean;
   estimatedValue?: number | null;
   demandAmount?: number | null;
   settlementAmount?: number | null;
@@ -87,6 +89,7 @@ export function valuesFromClaim(claim: ClaimMergeSource): MergeValues {
   const last = claim.claimantLastName.trim();
   const name = `${first} ${last}`.trim();
   const percent = claim.contingencyFeePercent ?? 20;
+  const feeCap = feeCapFor(Boolean(claim.isCatClaim));
   const basis =
     claim.settlementAmount ?? claim.demandAmount ?? claim.estimatedValue ?? null;
   const fee = feeEarned(basis, percent);
@@ -128,6 +131,9 @@ export function valuesFromClaim(claim: ClaimMergeSource): MergeValues {
     firm_phone: FIRM.phone,
     firm_email: FIRM.email,
     contingency_fee_percent: `${percent}%`,
+    fee_cap_percent: `${feeCap.capPercent}%`,
+    fee_cap_basis: feeCap.basis,
+    rescission_terms: rescissionTerms(Boolean(claim.isCatClaim)),
     estimated_value: money(claim.estimatedValue),
     demand_amount: money(claim.demandAmount),
     settlement_amount: money(claim.settlementAmount),

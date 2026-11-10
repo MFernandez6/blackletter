@@ -2,10 +2,9 @@
  * BLACKLETTER seed — staff, templates (all lifecycle types), stage map,
  * claim mirrors, and sample generated documents.
  *
- *   ALLOW_DESTRUCTIVE_SEED=1 npx prisma db seed
+ *   ALLOW_DESTRUCTIVE_SEED=1 SEED_PASSWORD=... npx prisma db seed
  *
- * Default password: Password123!
- * NEVER run against production.
+ * Local databases only: refuses Supabase-hosted URLs.
  */
 
 import { PrismaClient } from "@prisma/client";
@@ -24,7 +23,16 @@ if (process.env.ALLOW_DESTRUCTIVE_SEED !== "1") {
   process.exit(1);
 }
 
-const SEED_PASSWORD = "Password123!";
+if (/supabase\.(co|com)/i.test(process.env.DATABASE_URL ?? "")) {
+  console.error("Refusing to seed a Supabase-hosted database. The seed wipes BLACKLETTER data.");
+  process.exit(1);
+}
+
+const SEED_PASSWORD = process.env.SEED_PASSWORD ?? "";
+if (SEED_PASSWORD.length < 12) {
+  console.error("Set SEED_PASSWORD (12+ characters) for the local demo accounts.");
+  process.exit(1);
+}
 
 async function main() {
   await prisma.signatureEvent.deleteMany();
@@ -397,9 +405,10 @@ async function main() {
   });
 
   console.log("BLACKLETTER seed complete.");
-  console.log("  Admin    miguel.fernandez@blacklineadjusting.com / Password123!");
-  console.log("  Adjuster diana.reyes@blacklineadjusting.com / Password123!");
-  console.log("  Viewer   viewer@blacklineadjusting.com / Password123!");
+  console.log("  Admin    miguel.fernandez@blacklineadjusting.com");
+  console.log("  Adjuster diana.reyes@blacklineadjusting.com");
+  console.log("  Viewer   viewer@blacklineadjusting.com");
+  console.log("  Password: SEED_PASSWORD");
 }
 
 main()

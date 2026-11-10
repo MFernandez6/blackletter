@@ -12,6 +12,39 @@ export type CatalogEntry = {
   body: string;
 };
 
+/** Draft pending Florida counsel review (Fla. Stat. §§ 626.854, 626.8796, 817.234). */
+export const PA_CONTRACT_BODY = `PUBLIC ADJUSTER CONTRACT
+(Contingency Fee Agreement — Fla. Stat. § 626.8796)
+
+This Public Adjuster Contract is entered into on {{today}} between {{claimant_name}} ("Insured") of {{claimant_mailing_address}}, telephone {{claimant_phone}}, email {{claimant_email}}, and {{firm_name}} ("Firm"), {{firm_address}}, telephone {{firm_phone}}.
+
+Licensed public adjuster: {{adjuster_name}}, Florida license no. {{adjuster_license}}.
+
+1. Claim. Insured retains Firm as public adjuster to investigate, document, and negotiate the first-party property insurance claim for a {{loss_type}} loss on {{date_of_loss}} at {{property_address}}, {{county}} County, Florida {{zip_code}}. Insurer: {{carrier_name}}. Policy no. {{policy_number}}. Insurer claim no. {{insurer_claim_number}}. Blackline file {{claim_number}}.
+
+2. Fee. Insured agrees to pay Firm {{contingency_fee_percent}} of claim payments obtained by Firm after the date of this contract. The fee may not exceed {{fee_cap_percent}} ({{fee_cap_basis}}; Fla. Stat. § 626.854). No fee is owed on payments made or committed by the insurer before this contract was signed. No fee is owed if no additional recovery is obtained.
+
+3. Right to cancel. Insured may cancel this contract without penalty or fee {{rescission_terms}}. To cancel, deliver or send written notice to {{firm_name}} at {{firm_address}}. Notice is effective when sent.
+
+4. Costs. Ordinary file costs are absorbed by Firm unless otherwise agreed in writing. Expert or engineering retainers, if any, will be disclosed and approved by Insured before they are incurred.
+
+5. Insured duties. Insured will provide truthful information, access to the property, and copies of the policy, correspondence, and prior estimates.
+
+6. Not legal services. Firm is not a law firm and does not give legal advice. Insured may consult an attorney at any time.
+
+7. Governing law. Florida law governs this contract.
+
+FRAUD WARNING
+Pursuant to s. 817.234, Florida Statutes, any person who, with the intent to injure, defraud, or deceive any insurer or insured, prepares, presents, or causes to be presented a proof of loss or estimate of cost or repair of damaged property in support of a claim under an insurance policy knowing that the proof of loss or estimate of claim or repairs contains any false, incomplete, or misleading information concerning any fact or thing material to the claim commits a felony of the third degree, punishable as provided in s. 775.082, s. 775.083, or s. 775.084, Florida Statutes.
+
+Insured signature: ___________________________  Date and time: ______________
+Print name: {{claimant_name}}
+
+Public adjuster signature: ___________________________  Date and time: ______________
+{{adjuster_name}}, Florida license no. {{adjuster_license}}
+{{firm_name}}
+`;
+
 export const TEMPLATE_CATALOG: CatalogEntry[] = [
   {
     documentType: "LOR",
@@ -60,31 +93,7 @@ Public Adjuster · License {{adjuster_license}}
     aobOnly: false,
     sortOrder: 20,
     claimStatuses: ["INTAKE", "UNDER_REVIEW"],
-    body: `CONTRACT OF EMPLOYMENT — PUBLIC ADJUSTER
-(Contingency Fee Agreement)
-
-This Agreement is entered into as of {{today}} between {{claimant_name}} ("Client") of {{claimant_mailing_address}} and {{firm_name}} ("Firm").
-
-1. Engagement. Client retains Firm as public adjuster to investigate, document, and negotiate the first-party property insurance claim arising from a {{loss_type}} loss on {{date_of_loss}} at {{property_address}}, {{county}} County, Florida {{zip_code}} (Blackline File {{claim_number}}; Policy {{policy_number}}; Carrier {{carrier_name}}).
-
-2. Contingency fee. Client agrees to pay Firm a contingency fee of {{contingency_fee_percent}} of the amounts recovered on the claim, subject to the statutory ceilings in Fla. Stat. § 626.854. On a declared state-of-emergency (CAT) loss the fee shall not exceed the emergency cap then in force. No fee is due if no recovery is obtained.
-
-3. Costs. Ordinary file costs are absorbed by Firm unless otherwise agreed in writing. Expert or engineering retainers, if any, will be disclosed before they are incurred.
-
-4. Client duties. Client will provide truthful information, access to the property, and copies of the policy, correspondence, and prior estimates. Client will not settle the claim directly without notice to Firm.
-
-5. Not legal services. Firm is not a law firm. This engagement is not the practice of law. Client may consult independent counsel at any time.
-
-6. Cancellation. Client may cancel this contract within the period required by Florida law by written notice. After that period, withdrawal is governed by the statute and this agreement.
-
-7. Governing law. Florida law. Venue in the county of the loss or the Firm's principal place of business.
-
-Client signature: ___________________________  Date: ________
-Print name: {{claimant_name}}
-
-Firm: {{adjuster_name}}, License {{adjuster_license}}
-{{firm_name}}
-`,
+    body: PA_CONTRACT_BODY,
   },
   {
     documentType: "CLIENT_DISCLOSURE",

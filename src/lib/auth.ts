@@ -2,6 +2,7 @@ import { type NextAuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { safeEqual } from "@/lib/safe-compare";
 import { loginSchema } from "@/lib/schemas/login";
 import type { StaffRole } from "@/lib/types";
 
@@ -27,15 +28,15 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: StaffRole;
+    revoked?: boolean;
   }
 }
 
 function authSecret() {
-  return (
-    process.env.NEXTAUTH_SECRET?.trim() ||
-    process.env.AUTH_SECRET?.trim() ||
-    "blackletter-set-NEXTAUTH_SECRET-in-vercel"
-  );
+  const secret = process.env.NEXTAUTH_SECRET?.trim() || process.env.AUTH_SECRET?.trim();
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "development") return "blackletter-local-dev-only";
+  throw new Error("NEXTAUTH_SECRET is not set.");
 }
 
 export const authOptions: NextAuthOptions = {
@@ -101,6 +102,8 @@ export const authOptions: NextAuthOptions = {
           if (staff) {
             token.id = staff.id;
             token.role = staff.role as StaffRole;
+          } else {
+            token.revoked = true;
           }
         } catch {
           // keep existing token if DB is briefly unavailable
@@ -109,6 +112,9 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      if (token.revoked) {
+        return { ...session, user: undefined as unknown as typeof session.user };
+      }
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as StaffRole;
@@ -120,7 +126,8 @@ export const authOptions: NextAuthOptions = {
 
 export async function getSession() {
   try {
-    return await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
+    return session?.user?.id ? session : null;
   } catch (error) {
     console.error("getSession failed", error);
     return null;
@@ -172,5 +179,5 @@ export function isServiceKey(header: string | null): boolean {
   const key = process.env.BLACKLETTER_API_KEY;
   if (!key || !header) return false;
   const token = header.startsWith("Bearer ") ? header.slice(7) : header;
-  return token === key;
+  return safeEqual(token, key);
 }
