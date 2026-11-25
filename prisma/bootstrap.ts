@@ -15,7 +15,7 @@ import { hash } from "bcryptjs";
 import { TEMPLATE_CATALOG } from "../src/lib/templates/catalog";
 import { extractMergeFields } from "../src/lib/merge";
 
-const KEEP_EMAIL = "miguel.fernandez@blacklineadjusting.com";
+const KEEP_EMAIL = "miguel.fernandez@blacklinepublicadjusters.com";
 
 const prisma = new PrismaClient();
 

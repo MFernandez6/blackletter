@@ -51,7 +51,7 @@ async function main() {
   const miguel = await prisma.staff.create({
     data: {
       name: "Miguel Fernandez",
-      email: "miguel.fernandez@blacklineadjusting.com",
+      email: "miguel.fernandez@blacklinepublicadjusters.com",
       passwordHash,
       role: "ADMIN",
       licenseNumber: "W123456",
@@ -405,7 +405,7 @@ async function main() {
   });
 
   console.log("BLACKLETTER seed complete.");
-  console.log("  Admin    miguel.fernandez@blacklineadjusting.com");
+  console.log("  Admin    miguel.fernandez@blacklinepublicadjusters.com");
   console.log("  Adjuster diana.reyes@blacklineadjusting.com");
   console.log("  Viewer   viewer@blacklineadjusting.com");
   console.log("  Sign in with the BLACKBOX account. Staff passwords are not accepted.");
