@@ -16,6 +16,8 @@ import { BlacklineLogo } from "@/components/brand/blackline-mark";
 
 type LoginValues = z.infer<typeof loginSchema>;
 
+const PASSWORD_RESET_URL = `${(process.env.NEXT_PUBLIC_BLACKBOX_URL || "https://box.blacklinepublicadjusters.com").replace(/\/$/, "")}/forgot-password`;
+
 const LOGIN_ERROR_MESSAGES: Record<string, string> = {
   INVALID_CREDENTIALS: "Credentials rejected. Access denied.",
   ACCOUNT_LOCKED: "Too many failed attempts. This account is locked for 15 minutes — or ask an admin to unlock it in BLACKBOX.",
@@ -162,6 +164,11 @@ export default function LoginForm() {
           >
             {isSubmitting ? "Authenticating…" : "Enter BLACKLETTER™"}
           </Button>
+          <p className="text-center text-sm">
+            <a href={PASSWORD_RESET_URL} className="text-brand-gold underline underline-offset-4">
+              Forgot password?
+            </a>
+          </p>
         </form>
 
         <p className="mt-8 text-center font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-brand-slate">
