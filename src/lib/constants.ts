@@ -6,8 +6,8 @@ export const FIRM = {
     process.env.NEXT_PUBLIC_FIRM_NAME?.trim() || "BLACKLINE PUBLIC ADJUSTERS LLC",
   address: process.env.NEXT_PUBLIC_FIRM_ADDRESS?.trim() ?? "",
   phone: process.env.NEXT_PUBLIC_FIRM_PHONE?.trim() ?? "",
-  email: process.env.NEXT_PUBLIC_FIRM_EMAIL?.trim() || "files@blacklinepa.com",
-  website: process.env.NEXT_PUBLIC_FIRM_WEBSITE?.trim() || "blacklinepa.com",
+  email: process.env.NEXT_PUBLIC_FIRM_EMAIL?.trim() || "files@blacklinepublicadjusters.com",
+  website: process.env.NEXT_PUBLIC_FIRM_WEBSITE?.trim() || "blacklinepublicadjusters.com",
   statuteCite: "Fla. Stat. § 626.854",
   mediationCite: "Fla. Stat. § 627.7015",
 } as const;
